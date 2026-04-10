@@ -1,7 +1,7 @@
 import os
 
 # ── Site ──────────────────────────────────────────────────────────────
-SITE_URL  = os.environ.get("SITE_URL", "sc-domain:studyriserr.com")
+SITE_URL  = os.environ.get("SITE_URL", "https://studyriserr.com")
 SITE_NAME = "studyriserr.com"
 
 # ── GSC ───────────────────────────────────────────────────────────────
