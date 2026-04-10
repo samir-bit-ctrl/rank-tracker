@@ -1,0 +1,772 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Rank Tracker — {{ site_name }}</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@300;400;500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+  /* ── Reset & Base ────────────────────────────────────────────────── */
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg:          #0e1117;
+    --surface:     #161b25;
+    --surface2:    #1c2333;
+    --border:      #252d3d;
+    --border2:     #2e3a50;
+    --text:        #e2e8f0;
+    --text-muted:  #64748b;
+    --text-dim:    #94a3b8;
+    --green:       #34d399;
+    --green-dim:   #065f46;
+    --red:         #f87171;
+    --red-dim:     #7f1d1d;
+    --amber:       #fbbf24;
+    --amber-dim:   #78350f;
+    --blue:        #60a5fa;
+    --blue-dim:    #1e3a5f;
+    --purple:      #a78bfa;
+    --accent:      #3b82f6;
+    --font-sans:   'DM Sans', sans-serif;
+    --font-mono:   'DM Mono', monospace;
+    --radius:      8px;
+    --radius-lg:   12px;
+  }
+
+  html { font-size: 14px; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--font-sans);
+    min-height: 100vh;
+    line-height: 1.5;
+  }
+
+  /* ── Scrollbar ───────────────────────────────────────────────────── */
+  ::-webkit-scrollbar { width: 6px; height: 6px; }
+  ::-webkit-scrollbar-track { background: var(--bg); }
+  ::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 3px; }
+
+  /* ── Layout ──────────────────────────────────────────────────────── */
+  .app { max-width: 1400px; margin: 0 auto; padding: 0 24px 48px; }
+
+  /* ── Header ──────────────────────────────────────────────────────── */
+  .header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 28px 0 24px;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 32px;
+  }
+  .header-left { display: flex; align-items: center; gap: 14px; }
+  .logo {
+    width: 36px; height: 36px;
+    background: var(--accent);
+    border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 16px; font-weight: 700; color: #fff;
+    flex-shrink: 0;
+  }
+  .site-name {
+    font-size: 16px; font-weight: 600;
+    color: var(--text); letter-spacing: -0.3px;
+  }
+  .site-sub {
+    font-size: 11px; color: var(--text-muted);
+    font-family: var(--font-mono);
+    margin-top: 2px;
+  }
+  .header-right { display: flex; align-items: center; gap: 16px; }
+  .last-updated {
+    font-size: 11px; color: var(--text-muted);
+    font-family: var(--font-mono);
+    background: var(--surface);
+    padding: 6px 12px; border-radius: 20px;
+    border: 1px solid var(--border);
+  }
+  .pulse {
+    width: 7px; height: 7px;
+    background: var(--green);
+    border-radius: 50%;
+    display: inline-block;
+    margin-right: 6px;
+    animation: pulse 2s infinite;
+  }
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.3; }
+  }
+
+  /* ── Stat Cards ──────────────────────────────────────────────────── */
+  .stat-grid {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 12px;
+    margin-bottom: 28px;
+  }
+  @media (max-width: 1100px) { .stat-grid { grid-template-columns: repeat(3, 1fr); } }
+  @media (max-width: 600px)  { .stat-grid { grid-template-columns: repeat(2, 1fr); } }
+
+  .stat-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 18px 20px;
+    position: relative;
+    overflow: hidden;
+    transition: border-color 0.2s;
+  }
+  .stat-card:hover { border-color: var(--border2); }
+  .stat-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    background: var(--card-accent, var(--accent));
+    opacity: 0.6;
+  }
+  .stat-card.green  { --card-accent: var(--green); }
+  .stat-card.red    { --card-accent: var(--red); }
+  .stat-card.amber  { --card-accent: var(--amber); }
+  .stat-card.purple { --card-accent: var(--purple); }
+  .stat-card.blue   { --card-accent: var(--blue); }
+
+  .stat-label {
+    font-size: 10px; font-weight: 500;
+    color: var(--text-muted);
+    text-transform: uppercase; letter-spacing: 0.8px;
+    margin-bottom: 10px;
+  }
+  .stat-value {
+    font-size: 28px; font-weight: 600;
+    color: var(--text); letter-spacing: -1px;
+    line-height: 1;
+    font-family: var(--font-mono);
+  }
+  .stat-value.green  { color: var(--green); }
+  .stat-value.red    { color: var(--red); }
+  .stat-value.amber  { color: var(--amber); }
+  .stat-sub {
+    font-size: 11px; color: var(--text-muted);
+    margin-top: 6px; font-family: var(--font-mono);
+  }
+
+  /* ── Two-col layout ──────────────────────────────────────────────── */
+  .two-col {
+    display: grid;
+    grid-template-columns: 1fr 340px;
+    gap: 16px;
+    margin-bottom: 16px;
+  }
+  @media (max-width: 1000px) { .two-col { grid-template-columns: 1fr; } }
+
+  /* ── Panel ───────────────────────────────────────────────────────── */
+  .panel {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+  }
+  .panel-header {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 16px 20px;
+    border-bottom: 1px solid var(--border);
+  }
+  .panel-title {
+    font-size: 12px; font-weight: 600;
+    text-transform: uppercase; letter-spacing: 0.8px;
+    color: var(--text-dim);
+  }
+  .panel-badge {
+    font-size: 10px; font-family: var(--font-mono);
+    background: var(--surface2);
+    color: var(--text-muted);
+    padding: 3px 8px; border-radius: 20px;
+    border: 1px solid var(--border);
+  }
+  .panel-body { padding: 20px; }
+
+  /* ── Chart ───────────────────────────────────────────────────────── */
+  .chart-wrap { position: relative; height: 200px; }
+
+  /* ── Rank Zones ──────────────────────────────────────────────────── */
+  .zone-list { display: flex; flex-direction: column; gap: 10px; }
+  .zone-item {
+    display: flex; align-items: center; gap: 10px;
+  }
+  .zone-dot {
+    width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0;
+  }
+  .zone-label { flex: 1; font-size: 12px; color: var(--text-dim); }
+  .zone-count {
+    font-family: var(--font-mono); font-size: 13px;
+    font-weight: 500; color: var(--text); min-width: 32px; text-align: right;
+  }
+  .zone-pct {
+    font-family: var(--font-mono); font-size: 11px;
+    color: var(--text-muted); min-width: 44px; text-align: right;
+  }
+  .zone-bar-wrap {
+    flex: 1; height: 4px; background: var(--border);
+    border-radius: 2px; overflow: hidden; max-width: 80px;
+  }
+  .zone-bar { height: 100%; border-radius: 2px; }
+
+  /* ── Movers ──────────────────────────────────────────────────────── */
+  .movers-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-bottom: 16px;
+  }
+  @media (max-width: 700px) { .movers-grid { grid-template-columns: 1fr; } }
+
+  .mover-item {
+    display: flex; align-items: center; gap: 12px;
+    padding: 10px 12px;
+    border-radius: var(--radius);
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    transition: border-color 0.15s;
+  }
+  .mover-item:hover { border-color: var(--border2); }
+  .mover-rank {
+    font-family: var(--font-mono); font-size: 10px;
+    color: var(--text-muted); min-width: 16px; text-align: center;
+  }
+  .mover-kw {
+    flex: 1; font-size: 12px; color: var(--text);
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+  .mover-pos {
+    font-family: var(--font-mono); font-size: 11px; color: var(--text-dim);
+    white-space: nowrap;
+  }
+  .delta {
+    font-family: var(--font-mono); font-size: 11px; font-weight: 500;
+    padding: 2px 7px; border-radius: 4px; white-space: nowrap;
+  }
+  .delta.up   { color: var(--green); background: var(--green-dim); }
+  .delta.down { color: var(--red);   background: var(--red-dim); }
+  .delta.new  { color: var(--blue);  background: var(--blue-dim); }
+  .delta.lost { color: var(--text-muted); background: var(--surface2); }
+
+  /* ── Main Table ──────────────────────────────────────────────────── */
+  .table-controls {
+    display: flex; align-items: center; gap: 12px;
+    padding: 16px 20px;
+    border-bottom: 1px solid var(--border);
+    flex-wrap: wrap;
+  }
+  .search-wrap { position: relative; flex: 1; min-width: 200px; }
+  .search-wrap svg {
+    position: absolute; left: 10px; top: 50%; transform: translateY(-50%);
+    color: var(--text-muted); pointer-events: none;
+  }
+  .search-input {
+    width: 100%; background: var(--surface2);
+    border: 1px solid var(--border); border-radius: var(--radius);
+    color: var(--text); font-family: var(--font-sans); font-size: 12px;
+    padding: 8px 12px 8px 32px;
+    outline: none; transition: border-color 0.2s;
+  }
+  .search-input:focus { border-color: var(--accent); }
+  .search-input::placeholder { color: var(--text-muted); }
+
+  .filter-btn {
+    background: var(--surface2); border: 1px solid var(--border);
+    color: var(--text-dim); font-family: var(--font-sans); font-size: 11px;
+    padding: 7px 14px; border-radius: var(--radius); cursor: pointer;
+    transition: all 0.15s; white-space: nowrap;
+  }
+  .filter-btn:hover, .filter-btn.active {
+    background: var(--accent); border-color: var(--accent); color: #fff;
+  }
+
+  .table-wrap { overflow-x: auto; }
+  table {
+    width: 100%; border-collapse: collapse;
+    font-size: 12px;
+  }
+  thead th {
+    padding: 10px 16px;
+    text-align: left;
+    font-size: 10px; font-weight: 600;
+    text-transform: uppercase; letter-spacing: 0.8px;
+    color: var(--text-muted);
+    border-bottom: 1px solid var(--border);
+    background: var(--surface2);
+    cursor: pointer; user-select: none;
+    white-space: nowrap;
+  }
+  thead th:hover { color: var(--text); }
+  thead th.sorted { color: var(--blue); }
+  tbody tr {
+    border-bottom: 1px solid var(--border);
+    transition: background 0.1s;
+  }
+  tbody tr:hover { background: var(--surface2); }
+  tbody tr:last-child { border-bottom: none; }
+  td { padding: 9px 16px; color: var(--text-dim); vertical-align: middle; }
+  td.kw-cell {
+    color: var(--text); font-size: 12px;
+    max-width: 320px;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+  td.mono { font-family: var(--font-mono); }
+
+  .pos-badge {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 36px; height: 22px;
+    border-radius: 4px; font-family: var(--font-mono);
+    font-size: 11px; font-weight: 500;
+  }
+  .pos-1-3   { background: rgba(251,191,36,0.15); color: var(--amber); }
+  .pos-4-10  { background: rgba(52,211,153,0.12); color: var(--green); }
+  .pos-11-20 { background: rgba(251,191,36,0.10); color: #d97706; }
+  .pos-21    { background: rgba(248,113,113,0.10); color: var(--red); }
+
+  .sparkline { display: inline-block; vertical-align: middle; }
+
+  /* ── Pagination ──────────────────────────────────────────────────── */
+  .pagination {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 14px 20px;
+    border-top: 1px solid var(--border);
+    font-size: 11px; color: var(--text-muted);
+    font-family: var(--font-mono);
+  }
+  .page-btns { display: flex; gap: 4px; }
+  .page-btn {
+    width: 28px; height: 28px; border-radius: 6px;
+    background: var(--surface2); border: 1px solid var(--border);
+    color: var(--text-dim); cursor: pointer; font-size: 11px;
+    display: flex; align-items: center; justify-content: center;
+    transition: all 0.15s;
+  }
+  .page-btn:hover, .page-btn.active {
+    background: var(--accent); border-color: var(--accent); color: #fff;
+  }
+
+  /* ── Footer ──────────────────────────────────────────────────────── */
+  .footer {
+    margin-top: 32px; padding-top: 20px;
+    border-top: 1px solid var(--border);
+    display: flex; justify-content: space-between; align-items: center;
+    font-size: 11px; color: var(--text-muted); font-family: var(--font-mono);
+  }
+
+  /* ── Fade-in animation ───────────────────────────────────────────── */
+  .fade-in {
+    animation: fadeIn 0.4s ease both;
+  }
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(8px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  .fade-in:nth-child(1) { animation-delay: 0.05s; }
+  .fade-in:nth-child(2) { animation-delay: 0.10s; }
+  .fade-in:nth-child(3) { animation-delay: 0.15s; }
+  .fade-in:nth-child(4) { animation-delay: 0.20s; }
+  .fade-in:nth-child(5) { animation-delay: 0.25s; }
+  .fade-in:nth-child(6) { animation-delay: 0.30s; }
+
+  .empty { padding: 32px; text-align: center; color: var(--text-muted); font-size: 12px; }
+</style>
+</head>
+<body>
+<div class="app">
+
+  <!-- ── Header ──────────────────────────────────────────────────── -->
+  <header class="header">
+    <div class="header-left">
+      <div class="logo">R</div>
+      <div>
+        <div class="site-name">{{ site_name }}</div>
+        <div class="site-sub">Rank Tracker · GSC API</div>
+      </div>
+    </div>
+    <div class="header-right">
+      <span class="last-updated">
+        <span class="pulse"></span>
+        Updated {{ today_date }}
+      </span>
+    </div>
+  </header>
+
+  <!-- ── Stat Cards ───────────────────────────────────────────────── -->
+  <div class="stat-grid">
+    <div class="stat-card fade-in">
+      <div class="stat-label">Total Keywords</div>
+      <div class="stat-value">{{ total_keywords }}</div>
+      <div class="stat-sub">tracked</div>
+    </div>
+    <div class="stat-card fade-in">
+      <div class="stat-label">Avg Position</div>
+      <div class="stat-value {% if avg_position <= 10 %}green{% elif avg_position <= 20 %}amber{% else %}red{% endif %}">
+        {{ avg_position }}
+      </div>
+      <div class="stat-sub">overall</div>
+    </div>
+    <div class="stat-card green fade-in">
+      <div class="stat-label">Improved</div>
+      <div class="stat-value green">{{ improved_count }}</div>
+      <div class="stat-sub">keywords ↑</div>
+    </div>
+    <div class="stat-card red fade-in">
+      <div class="stat-label">Dropped</div>
+      <div class="stat-value red">{{ dropped_count }}</div>
+      <div class="stat-sub">keywords ↓</div>
+    </div>
+    <div class="stat-card blue fade-in">
+      <div class="stat-label">New</div>
+      <div class="stat-value" style="color:var(--blue)">{{ new_count }}</div>
+      <div class="stat-sub">appeared</div>
+    </div>
+    <div class="stat-card fade-in">
+      <div class="stat-label">Lost</div>
+      <div class="stat-value" style="color:var(--text-muted)">{{ lost_count }}</div>
+      <div class="stat-sub">disappeared</div>
+    </div>
+  </div>
+
+  <!-- ── Chart + Zones ────────────────────────────────────────────── -->
+  <div class="two-col" style="margin-bottom:16px;">
+    <div class="panel fade-in">
+      <div class="panel-header">
+        <span class="panel-title">Position Distribution</span>
+        <span class="panel-badge">{{ today_date }}</span>
+      </div>
+      <div class="panel-body">
+        <div class="chart-wrap">
+          <canvas id="distChart"></canvas>
+        </div>
+      </div>
+    </div>
+    <div class="panel fade-in">
+      <div class="panel-header">
+        <span class="panel-title">Rank Zones</span>
+        <span class="panel-badge">{{ total_keywords }} kws</span>
+      </div>
+      <div class="panel-body">
+        <div class="zone-list">
+          {% for zone in rank_zones %}
+          <div class="zone-item">
+            <div class="zone-dot" style="background:{{ zone.color }}"></div>
+            <div class="zone-label">{{ zone.label }}</div>
+            <div class="zone-bar-wrap">
+              <div class="zone-bar" style="width:{{ zone.pct }}%;background:{{ zone.color }}"></div>
+            </div>
+            <div class="zone-count">{{ zone.count }}</div>
+            <div class="zone-pct">{{ zone.pct }}%</div>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Movers ───────────────────────────────────────────────────── -->
+  <div class="movers-grid">
+    <div class="panel fade-in">
+      <div class="panel-header">
+        <span class="panel-title">Top Gainers</span>
+        <span class="panel-badge">↑ improved</span>
+      </div>
+      <div class="panel-body" style="display:flex;flex-direction:column;gap:6px;">
+        {% if improved %}
+          {% for kw in improved %}
+          <div class="mover-item">
+            <div class="mover-rank">{{ loop.index }}</div>
+            <div class="mover-kw" title="{{ kw.keyword }}">{{ kw.keyword }}</div>
+            <div class="mover-pos">{{ kw.previous_position }} → {{ kw.position }}</div>
+            <div class="delta up">+{{ kw.delta }}</div>
+          </div>
+          {% endfor %}
+        {% else %}
+          <div class="empty">No improvements today</div>
+        {% endif %}
+      </div>
+    </div>
+    <div class="panel fade-in">
+      <div class="panel-header">
+        <span class="panel-title">Top Drops</span>
+        <span class="panel-badge">↓ dropped</span>
+      </div>
+      <div class="panel-body" style="display:flex;flex-direction:column;gap:6px;">
+        {% if dropped %}
+          {% for kw in dropped %}
+          <div class="mover-item">
+            <div class="mover-rank">{{ loop.index }}</div>
+            <div class="mover-kw" title="{{ kw.keyword }}">{{ kw.keyword }}</div>
+            <div class="mover-pos">{{ kw.previous_position }} → {{ kw.position }}</div>
+            <div class="delta down">{{ kw.delta }}</div>
+          </div>
+          {% endfor %}
+        {% else %}
+          <div class="empty">No drops today</div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+
+  <!-- ── New & Lost ───────────────────────────────────────────────── -->
+  <div class="movers-grid">
+    <div class="panel fade-in">
+      <div class="panel-header">
+        <span class="panel-title">New Keywords</span>
+        <span class="panel-badge">🆕 appeared</span>
+      </div>
+      <div class="panel-body" style="display:flex;flex-direction:column;gap:6px;">
+        {% if new_keywords %}
+          {% for kw in new_keywords %}
+          <div class="mover-item">
+            <div class="mover-rank">{{ loop.index }}</div>
+            <div class="mover-kw" title="{{ kw.keyword }}">{{ kw.keyword }}</div>
+            <div class="mover-pos">{{ kw.clicks }} clicks</div>
+            <div class="delta new">pos {{ kw.position }}</div>
+          </div>
+          {% endfor %}
+        {% else %}
+          <div class="empty">No new keywords</div>
+        {% endif %}
+      </div>
+    </div>
+    <div class="panel fade-in">
+      <div class="panel-header">
+        <span class="panel-title">Lost Keywords</span>
+        <span class="panel-badge">💀 disappeared</span>
+      </div>
+      <div class="panel-body" style="display:flex;flex-direction:column;gap:6px;">
+        {% if lost_keywords %}
+          {% for kw in lost_keywords %}
+          <div class="mover-item">
+            <div class="mover-rank">{{ loop.index }}</div>
+            <div class="mover-kw" title="{{ kw.keyword }}">{{ kw.keyword }}</div>
+            <div class="mover-pos">{{ kw.clicks }} clicks</div>
+            <div class="delta lost">was {{ kw.position }}</div>
+          </div>
+          {% endfor %}
+        {% else %}
+          <div class="empty">No lost keywords</div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Full Keyword Table ────────────────────────────────────────── -->
+  <div class="panel fade-in" style="margin-top:4px;">
+    <div class="panel-header">
+      <span class="panel-title">All Keywords</span>
+      <span class="panel-badge" id="kw-count">{{ total_keywords }} keywords</span>
+    </div>
+    <div class="table-controls">
+      <div class="search-wrap">
+        <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+          <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+        </svg>
+        <input class="search-input" type="text" id="searchInput" placeholder="Search keywords..."/>
+      </div>
+      <button class="filter-btn active" onclick="filterTable('all', this)">All</button>
+      <button class="filter-btn" onclick="filterTable('top3', this)">Top 3</button>
+      <button class="filter-btn" onclick="filterTable('top10', this)">Top 10</button>
+      <button class="filter-btn" onclick="filterTable('improved', this)">Improved</button>
+      <button class="filter-btn" onclick="filterTable('dropped', this)">Dropped</button>
+    </div>
+    <div class="table-wrap">
+      <table id="kwTable">
+        <thead>
+          <tr>
+            <th onclick="sortTable(0)">#</th>
+            <th onclick="sortTable(1)">Keyword</th>
+            <th onclick="sortTable(2)" class="sorted">Position</th>
+            <th onclick="sortTable(3)">Change</th>
+            <th onclick="sortTable(4)">Clicks</th>
+            <th onclick="sortTable(5)">Impressions</th>
+            <th onclick="sortTable(6)">CTR %</th>
+          </tr>
+        </thead>
+        <tbody id="kwBody">
+          {% for kw in all_keywords %}
+          <tr data-pos="{{ kw.position }}"
+              data-delta="{{ kw.delta if kw.delta is defined else 0 }}"
+              data-status="{{ kw.status }}">
+            <td class="mono" style="color:var(--text-muted)">{{ loop.index }}</td>
+            <td class="kw-cell">{{ kw.keyword }}</td>
+            <td>
+              <span class="pos-badge
+                {% if kw.position <= 3 %}pos-1-3
+                {% elif kw.position <= 10 %}pos-4-10
+                {% elif kw.position <= 20 %}pos-11-20
+                {% else %}pos-21{% endif %}">
+                {{ kw.position }}
+              </span>
+            </td>
+            <td>
+              {% if kw.delta is defined and kw.delta != 0 %}
+                <span class="delta {% if kw.delta > 0 %}up{% else %}down{% endif %}">
+                  {% if kw.delta > 0 %}+{% endif %}{{ kw.delta }}
+                </span>
+              {% else %}
+                <span style="color:var(--text-muted);font-family:var(--font-mono);font-size:11px;">—</span>
+              {% endif %}
+            </td>
+            <td class="mono">{{ kw.clicks }}</td>
+            <td class="mono" style="color:var(--text-muted)">{{ kw.impressions }}</td>
+            <td class="mono" style="color:var(--text-muted)">{{ kw.ctr }}%</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    <div class="pagination">
+      <span id="pageInfo">Showing 1–50 of {{ total_keywords }}</span>
+      <div class="page-btns" id="pageBtns"></div>
+    </div>
+  </div>
+
+  <!-- ── Footer ───────────────────────────────────────────────────── -->
+  <div class="footer">
+    <span>rank-tracker · {{ site_name }}</span>
+    <span>generated {{ today_date }} · GSC API</span>
+  </div>
+
+</div>
+
+<script>
+// ── Data from Python ────────────────────────────────────────────────
+const distData = {{ dist_data | tojson }};
+
+// ── Distribution Chart ──────────────────────────────────────────────
+const ctx = document.getElementById('distChart').getContext('2d');
+new Chart(ctx, {
+  type: 'bar',
+  data: {
+    labels: distData.labels,
+    datasets: [{
+      label: 'Keywords',
+      data: distData.values,
+      backgroundColor: distData.values.map((_, i) => {
+        const colors = ['#fbbf24','#34d399','#34d399','#34d399',
+                        '#34d399','#34d399','#34d399','#60a5fa',
+                        '#60a5fa','#60a5fa','#f87171','#f87171',
+                        '#f87171','#f87171','#f87171'];
+        return (colors[i] || '#475569') + '99';
+      }),
+      borderColor: distData.values.map((_, i) => {
+        const colors = ['#fbbf24','#34d399','#34d399','#34d399',
+                        '#34d399','#34d399','#34d399','#60a5fa',
+                        '#60a5fa','#60a5fa','#f87171','#f87171',
+                        '#f87171','#f87171','#f87171'];
+        return colors[i] || '#475569';
+      }),
+      borderWidth: 1,
+      borderRadius: 4,
+    }]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false,
+    plugins: { legend: { display: false }, tooltip: {
+      backgroundColor: '#1c2333', borderColor: '#252d3d', borderWidth: 1,
+      titleColor: '#94a3b8', bodyColor: '#e2e8f0',
+      callbacks: { title: (i) => `Position ${i[0].label}` }
+    }},
+    scales: {
+      x: { grid: { color: '#252d3d' }, ticks: { color: '#64748b', font: { size: 10 } } },
+      y: { grid: { color: '#252d3d' }, ticks: { color: '#64748b', font: { size: 10 } } }
+    }
+  }
+});
+
+// ── Table filter + search + sort + pagination ───────────────────────
+const rows      = Array.from(document.querySelectorAll('#kwBody tr'));
+const PAGE_SIZE = 50;
+let currentPage   = 1;
+let currentFilter = 'all';
+let currentSort   = { col: 2, asc: true };
+let filteredRows  = [...rows];
+
+function filterTable(type, btn) {
+  currentFilter = type;
+  currentPage   = 1;
+  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  applyFilters();
+}
+
+document.getElementById('searchInput').addEventListener('input', function() {
+  currentPage = 1;
+  applyFilters();
+});
+
+function applyFilters() {
+  const q = document.getElementById('searchInput').value.toLowerCase();
+  filteredRows = rows.filter(row => {
+    const kw  = row.cells[1].textContent.toLowerCase();
+    const pos = parseFloat(row.dataset.pos);
+    const delta = parseFloat(row.dataset.delta);
+    const matchSearch = !q || kw.includes(q);
+    let matchFilter = true;
+    if (currentFilter === 'top3')     matchFilter = pos <= 3;
+    if (currentFilter === 'top10')    matchFilter = pos <= 10;
+    if (currentFilter === 'improved') matchFilter = delta > 0;
+    if (currentFilter === 'dropped')  matchFilter = delta < 0;
+    return matchSearch && matchFilter;
+  });
+  renderPage();
+}
+
+function sortTable(col) {
+  if (currentSort.col === col) currentSort.asc = !currentSort.asc;
+  else { currentSort.col = col; currentSort.asc = true; }
+  document.querySelectorAll('thead th').forEach((th, i) => {
+    th.classList.toggle('sorted', i === col);
+  });
+  filteredRows.sort((a, b) => {
+    let av = a.cells[col].textContent.trim();
+    let bv = b.cells[col].textContent.trim();
+    const an = parseFloat(av), bn = parseFloat(bv);
+    if (!isNaN(an) && !isNaN(bn)) return currentSort.asc ? an - bn : bn - an;
+    return currentSort.asc ? av.localeCompare(bv) : bv.localeCompare(av);
+  });
+  renderPage();
+}
+
+function renderPage() {
+  const start = (currentPage - 1) * PAGE_SIZE;
+  const end   = start + PAGE_SIZE;
+  const tbody = document.getElementById('kwBody');
+  tbody.innerHTML = '';
+  filteredRows.slice(start, end).forEach((row, i) => {
+    const clone = row.cloneNode(true);
+    clone.cells[0].textContent = start + i + 1;
+    tbody.appendChild(clone);
+  });
+  document.getElementById('kw-count').textContent =
+    `${filteredRows.length} keywords`;
+  document.getElementById('pageInfo').textContent =
+    `Showing ${Math.min(start+1, filteredRows.length)}–${Math.min(end, filteredRows.length)} of ${filteredRows.length}`;
+  renderPagination();
+}
+
+function renderPagination() {
+  const total = Math.ceil(filteredRows.length / PAGE_SIZE);
+  const wrap  = document.getElementById('pageBtns');
+  wrap.innerHTML = '';
+  for (let i = 1; i <= Math.min(total, 8); i++) {
+    const btn = document.createElement('button');
+    btn.className = 'page-btn' + (i === currentPage ? ' active' : '');
+    btn.textContent = i;
+    btn.onclick = () => { currentPage = i; renderPage(); };
+    wrap.appendChild(btn);
+  }
+}
+
+renderPage();
+</script>
+</body>
+</html>
