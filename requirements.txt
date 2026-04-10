@@ -2,7 +2,7 @@ google-auth
 google-auth-httplib2
 google-api-python-client
 gspread
-python-telegram-bot
+python-telegram-bot[job-queue]
 jinja2
 requests
-dotenv
+python-dotenv
