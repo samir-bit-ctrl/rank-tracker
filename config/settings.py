@@ -10,7 +10,7 @@ DAYS_TO_FETCH    = 7
 MAX_KEYWORDS     = 500
 
 # ── Sheets ────────────────────────────────────────────────────────────
-SHEET_ID              = os.environ.get("SHEET_ID", "your_sheet_id_here")
+SHEET_ID              = os.environ.get("SHEET_ID", "1oI1sZyZxeMGLmL4H5TFl-PxOIvEQ3foQ4HreC1UOXV4")
 SHEET_NAME_DASHBOARD  = "📊 Dashboard"
 SHEET_NAME_DAILY_LOG  = "📈 Daily Log"
 SHEET_NAME_MOVERS     = "🟢 Movers"
@@ -27,6 +27,6 @@ TEAMS_WEBHOOK_URL = os.environ.get("TEAMS_WEBHOOK_URL", "")
 POSITION_CHANGE_THRESHOLD = 3
 
 # ── Dashboard ─────────────────────────────────────────────────────────
-GITHUB_USERNAME = "YOUR_GITHUB_USERNAME"
+GITHUB_USERNAME = "samir-bit-ctrl"
 GITHUB_REPO     = "rank-tracker"
-DASHBOARD_URL   = f"https://samir-bit-ctrl.github.io/rank-tracker/"
+DASHBOARD_URL   = f"https://{GITHUB_USERNAME}.github.io/{GITHUB_REPO}/"
