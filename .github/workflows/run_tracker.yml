@@ -40,9 +40,11 @@ jobs:
         run: |
           git config user.name  "rank-tracker-bot"
           git config user.email "bot@studyriserr.com"
-          git add data/history.json
-          git diff --staged --quiet || git commit -m "chore: update rank history $(date +'%Y-%m-%d')"
-          git push origin main
+          git config advice.addIgnoredFile false
+          git add -f data/history.json
+          git status
+          git diff --staged --quiet && echo "No changes to commit" || git commit -m "chore: update rank history $(date +'%Y-%m-%d')"
+          git push origin main || echo "Nothing to push"
 
       - name: Deploy dashboard to GitHub Pages
         uses: peaceiris/actions-gh-pages@v4
