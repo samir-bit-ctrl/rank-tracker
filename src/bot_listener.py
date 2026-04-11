@@ -148,24 +148,48 @@ async def cmd_gainers(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await update.message.reply_text("\n".join(lines), parse_mode="HTML")
 
 
-async def cmd_drops(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    """Show today's top drops."""
-    from src.analyzer import analyze_changes
-    report = analyze_changes()
+async def cmd_targets(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """Show live status of all target keywords."""
+    await update.message.reply_text("🎯 Fetching target keyword data...")
 
-    if not report or not report["dropped"]:
-        await update.message.reply_text("📊 No drops detected yet.")
-        return
-
-    lines = [f"📉 <b>Top Drops — {report['today_date']}</b>\n"]
-    for kw in report["dropped"][:10]:
-        lines.append(
-            f"🔴 <code>{kw['keyword'][:40]}</code>\n"
-            f"   {kw['previous_position']} → <b>{kw['position']}</b> "
-            f"<i>({kw['delta']})</i>"
+    try:
+        from src.target_keywords import (
+            run_target_tracker, build_target_alert
         )
+        result = run_target_tracker()
 
-    await update.message.reply_text("\n".join(lines), parse_mode="HTML")
+        if not result:
+            await update.message.reply_text("⚠️ No target keywords found.")
+            return
+
+        intel = result["intel"]
+        lines = [f"🎯 <b>Target Keywords — Live Status</b>\n"]
+
+        for k in intel:
+            pos = k["current_position"]
+            if pos == "—":
+                zone = "❌"
+            elif pos <= 3:   zone = "🥇"
+            elif pos <= 10:  zone = "🟢"
+            elif pos <= 20:  zone = "🟡"
+            else:            zone = "🔴"
+
+            delta = k["delta"]
+            delta_str = f"+{delta}" if delta > 0 else str(delta) if delta != 0 else "—"
+
+            lines.append(
+                f"{zone} <code>{k['keyword'][:38]}</code>\n"
+                f"   Pos: <b>{pos}</b>  Δ: <i>{delta_str}</i>  "
+                f"Clicks: {k['clicks_7d']}  CTR: {k['ctr']}%\n"
+                f"   {k['status']}  ·  {k['opportunity']}"
+            )
+
+        await update.message.reply_text("\n".join(lines), parse_mode="HTML")
+
+    except Exception as e:
+        await update.message.reply_text(
+            f"❌ Error:\n<code>{e}</code>", parse_mode="HTML"
+        )
 
 
 def run_bot():
@@ -182,5 +206,6 @@ def run_bot():
     app.add_handler(CommandHandler("top",     cmd_top))
     app.add_handler(CommandHandler("gainers", cmd_gainers))
     app.add_handler(CommandHandler("drops",   cmd_drops))
-
+    app.add_handler(CommandHandler("targets", cmd_targets))
+    
     app.run_polling(allowed_updates=Update.ALL_TYPES)
