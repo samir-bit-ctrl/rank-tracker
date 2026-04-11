@@ -137,12 +137,50 @@ def check_ai_overview(keyword: str, site: str) -> dict:
 #  READ TARGET KEYWORDS (reuse existing sheet)
 # ══════════════════════════════════════════════════════════════════════
 def read_target_keywords_simple(spreadsheet) -> list:
-    """Read just the keyword names from 🎯 Target Keywords sheet."""
+    """
+    Read AI check keywords from 🎯 Target Keywords sheet.
+    Column A = seed
+    Column C = ai_keyword (optional, falls back to seed if empty)
+    Returns list of dicts: {seed, ai_keyword}
+    """
     try:
-        ws   = spreadsheet.worksheet("🎯 Target Keywords")
-        vals = ws.col_values(1)
-        return [k.strip().lower() for k in vals[1:] if k.strip()]
-    except Exception:
+        ws       = spreadsheet.worksheet("🎯 Target Keywords")
+        all_vals = ws.get_all_values()
+
+        keywords = []
+        for row in all_vals[1:]:   # skip header
+            if not row or not row[0].strip():
+                continue
+
+            seed       = row[0].strip().lower()
+            ai_keyword = ""
+
+            # Column C (index 2)
+            if len(row) > 2 and row[2].strip():
+                ai_keyword = row[2].strip().lower()
+            else:
+                ai_keyword = seed   # fallback to seed
+
+            keywords.append({
+                "seed":       seed,
+                "ai_keyword": ai_keyword
+            })
+
+        # Show what we're going to check
+        print(f"📋 Found {len(keywords)} keywords for AI Overview check:")
+        for k in keywords:
+            if k["ai_keyword"] != k["seed"]:
+                print(f"   • {k['seed']} → checking: '{k['ai_keyword']}'")
+            else:
+                print(f"   • {k['seed']}")
+
+        return keywords
+
+    except gspread.WorksheetNotFound:
+        print(f"⚠️  Sheet '🎯 Target Keywords' not found")
+        return []
+    except Exception as e:
+        print(f"⚠️  Error reading target keywords: {e}")
         return []
 
 
@@ -167,23 +205,25 @@ def write_ai_overview_sheet(spreadsheet, results: list):
     has_overview = [r for r in results if r.get("has_overview")]
     site_cited   = [r for r in results if r.get("site_cited")]
     no_overview  = [r for r in results if not r.get("has_overview")]
-    errors       = [r for r in results if r.get("error")]
 
     rows = [
         # Title
         [f"🤖 AI OVERVIEW TRACKER — {today}", "", "", "", "",
-         "", "", "", "", ""],
-        # Summary stats
+         "", "", "", "", "", "", "", ""],
+        # Summary labels
         ["Total Checked", "AI Overview Exists",
-         "We're Cited", "Not in Overview",
+         "We're Cited", "Not Cited (but overview exists)",
          "No AI Overview", ""],
+        # Summary values
         [total, len(has_overview), len(site_cited),
          len(has_overview) - len(site_cited),
          len(no_overview), ""],
-        [""],   # spacer
+        # Spacer
+        [""],
         # Column headers
         [
-            "Keyword",
+            "Seed Keyword",
+            "Checked Keyword",
             "AI Overview",
             "We're Cited",
             "Cite Snippet",
@@ -198,20 +238,21 @@ def write_ai_overview_sheet(spreadsheet, results: list):
         ]
     ]
 
-    header_row = len(rows) - 1   # 0-indexed
+    header_row = len(rows) - 1   # 0-indexed = row 4
 
     for r in results:
         if r.get("error"):
             rows.append([
-                r["keyword"], "⚠️ Error", "", r["error"],
-                "", "", "", "", "", "", "", r.get("checked_at", "")
+                r.get("seed", ""),
+                r.get("ai_keyword", ""),
+                "⚠️ Error", "", r["error"],
+                "", "", "", "", "", "", "",
+                r.get("checked_at", "")
             ])
             continue
 
-        # AI Overview status
         overview_str = "✅ Yes" if r["has_overview"] else "❌ No"
 
-        # Citation status
         if not r["has_overview"]:
             cited_str = "—"
         elif r["site_cited"]:
@@ -219,7 +260,6 @@ def write_ai_overview_sheet(spreadsheet, results: list):
         else:
             cited_str = "❌ Not Cited"
 
-        # Opportunity
         if r["site_cited"]:
             opportunity = "🏆 Maintain — We're cited"
         elif r["has_overview"] and r.get("organic_pos") and r["organic_pos"] <= 5:
@@ -233,11 +273,12 @@ def write_ai_overview_sheet(spreadsheet, results: list):
         else:
             opportunity = "📈 Improve content depth"
 
-        paa_str     = " | ".join(r.get("paa", [])[:2])
+        paa_str     = " | ".join(r.get("paa",     [])[:2])
         related_str = " | ".join(r.get("related", [])[:3])
 
         rows.append([
-            r["keyword"],
+            r.get("seed", ""),
+            r.get("ai_keyword", r.get("keyword", "")),
             overview_str,
             cited_str,
             r.get("cite_snippet", "—"),
@@ -253,7 +294,7 @@ def write_ai_overview_sheet(spreadsheet, results: list):
 
     ws.update("A1", rows)
 
-    # ── Formatting ────────────────────────────────────────────────────
+    # ── Formatting requests ───────────────────────────────────────────
     requests = [
         # Whole sheet background
         {"repeatCell": {
@@ -298,7 +339,7 @@ def write_ai_overview_sheet(spreadsheet, results: list):
             }},
             "fields": "userEnteredFormat"
         }},
-        # Column headers
+        # Column headers row
         {"repeatCell": {
             "range": {"sheetId": sid,
                       "startRowIndex": header_row,
@@ -325,7 +366,7 @@ def write_ai_overview_sheet(spreadsheet, results: list):
             },
             "index": 0
         }},
-        # Freeze
+        # Freeze header + seed column
         {"updateSheetProperties": {
             "properties": {
                 "sheetId": sid,
@@ -339,43 +380,55 @@ def write_ai_overview_sheet(spreadsheet, results: list):
                       "gridProperties.frozenColumnCount,"
                       "gridProperties.hideGridlines"
         }},
-        # Column widths
+        # Seed keyword column width
         {"updateDimensionProperties": {
             "range": {"sheetId": sid, "dimension": "COLUMNS",
                       "startIndex": 0, "endIndex": 1},
-            "properties": {"pixelSize": 220}, "fields": "pixelSize"
+            "properties": {"pixelSize": 160}, "fields": "pixelSize"
         }},
+        # Checked keyword column width
         {"updateDimensionProperties": {
             "range": {"sheetId": sid, "dimension": "COLUMNS",
-                      "startIndex": 1, "endIndex": 3},
-            "properties": {"pixelSize": 130}, "fields": "pixelSize"
-        }},
-        {"updateDimensionProperties": {
-            "range": {"sheetId": sid, "dimension": "COLUMNS",
-                      "startIndex": 3, "endIndex": 4},
+                      "startIndex": 1, "endIndex": 2},
             "properties": {"pixelSize": 200}, "fields": "pixelSize"
         }},
+        # AI Overview + Cited columns
         {"updateDimensionProperties": {
             "range": {"sheetId": sid, "dimension": "COLUMNS",
-                      "startIndex": 6, "endIndex": 7},
-            "properties": {"pixelSize": 280}, "fields": "pixelSize"
+                      "startIndex": 2, "endIndex": 4},
+            "properties": {"pixelSize": 130}, "fields": "pixelSize"
         }},
+        # Cite snippet
+        {"updateDimensionProperties": {
+            "range": {"sheetId": sid, "dimension": "COLUMNS",
+                      "startIndex": 4, "endIndex": 5},
+            "properties": {"pixelSize": 200}, "fields": "pixelSize"
+        }},
+        # Ranking URL
         {"updateDimensionProperties": {
             "range": {"sheetId": sid, "dimension": "COLUMNS",
                       "startIndex": 7, "endIndex": 8},
-            "properties": {"pixelSize": 220}, "fields": "pixelSize"
+            "properties": {"pixelSize": 280}, "fields": "pixelSize"
         }},
+        # Opportunity
         {"updateDimensionProperties": {
             "range": {"sheetId": sid, "dimension": "COLUMNS",
-                      "startIndex": 8, "endIndex": 10},
+                      "startIndex": 8, "endIndex": 9},
+            "properties": {"pixelSize": 220}, "fields": "pixelSize"
+        }},
+        # PAA + Related
+        {"updateDimensionProperties": {
+            "range": {"sheetId": sid, "dimension": "COLUMNS",
+                      "startIndex": 9, "endIndex": 11},
             "properties": {"pixelSize": 260}, "fields": "pixelSize"
         }},
     ]
 
-    # Color-code cited column per row
+    # ── Color-code cited column (col D = index 3) per row ─────────────
     data_start = header_row + 1
     for i, r in enumerate(results):
         row_idx = data_start + i
+
         if r.get("site_cited"):
             color = ACCENT_GREEN
         elif r.get("has_overview") and not r.get("site_cited"):
@@ -389,11 +442,31 @@ def write_ai_overview_sheet(spreadsheet, results: list):
             "range": {"sheetId": sid,
                       "startRowIndex":    row_idx,
                       "endRowIndex":      row_idx + 1,
-                      "startColumnIndex": 2,
-                      "endColumnIndex":   3},
+                      "startColumnIndex": 3,
+                      "endColumnIndex":   4},
             "cell": {"userEnteredFormat": {
                 "textFormat": {"foregroundColor": color,
                                "bold": True}
+            }},
+            "fields": "userEnteredFormat.textFormat"
+        }})
+
+        # Color-code opportunity column (index 8)
+        opp = r.get("opportunity", "")
+        if "Maintain" in str(opp):        opp_color = ACCENT_GREEN
+        elif "Optimize" in str(opp):      opp_color = ACCENT_AMBER
+        elif "structured" in str(opp):    opp_color = ACCENT_BLUE
+        elif "Not ranking" in str(opp):   opp_color = ACCENT_RED
+        else:                             opp_color = SUBTLE_TEXT
+
+        requests.append({"repeatCell": {
+            "range": {"sheetId": sid,
+                      "startRowIndex":    row_idx,
+                      "endRowIndex":      row_idx + 1,
+                      "startColumnIndex": 8,
+                      "endColumnIndex":   9},
+            "cell": {"userEnteredFormat": {
+                "textFormat": {"foregroundColor": opp_color}
             }},
             "fields": "userEnteredFormat.textFormat"
         }})
@@ -404,9 +477,8 @@ def write_ai_overview_sheet(spreadsheet, results: list):
         print(f"⚠️  Formatting error: {e}")
 
     print(f"✅ AI Overview sheet written — {len(results)} keywords checked")
-    print(f"   AI Overviews found: {len(has_overview)}")
-    print(f"   We're cited in:     {len(site_cited)}")
-
+    print(f"   AI Overviews found : {len(has_overview)}")
+    print(f"   We're cited in     : {len(site_cited)}")
 
 # ══════════════════════════════════════════════════════════════════════
 #  TELEGRAM ALERT
@@ -463,40 +535,59 @@ def run_ai_overview_check():
 
     print("\n🤖 Running AI Overview Check...")
 
-    creds       = service_account.Credentials.from_service_account_file(
+    creds = service_account.Credentials.from_service_account_file(
         CREDENTIALS_PATH, scopes=SCOPES
     )
     sheets_client = gspread.authorize(creds)
     spreadsheet   = sheets_client.open_by_key(SHEET_ID)
 
-    # Read target keywords
-    keywords = read_target_keywords_simple(spreadsheet)
-    if not keywords:
-        print("⚠️  No target keywords found")
+    # Read keywords
+    targets = read_target_keywords_simple(spreadsheet)
+    if not targets:
+        print("⚠️  No keywords found")
         return None
 
-    # Respect 100/month limit — check unique seeds only
-    # Deduplicate and cap at 80 to leave buffer
-    keywords = list(dict.fromkeys(keywords))[:80]
-    print(f"🔍 Checking {len(keywords)} keywords for AI Overview...")
+    # Deduplicate by ai_keyword to avoid wasting credits
+    seen       = set()
+    unique     = []
+    for t in targets:
+        if t["ai_keyword"] not in seen:
+            seen.add(t["ai_keyword"])
+            unique.append(t)
+
+    # Cap at 25 for free tier safety
+    unique = unique[:25]
+    print(f"\n🔍 Checking {len(unique)} unique keywords "
+          f"(capped at 25 for free tier)...")
 
     results = []
-    for i, kw in enumerate(keywords):
-        print(f"  [{i+1}/{len(keywords)}] {kw}...", end=" ")
-        result = check_ai_overview(kw, "studyriserr.com")
+    for i, target in enumerate(unique):
+        ai_kw = target["ai_keyword"]
+        seed  = target["seed"]
+
+        label = f"'{ai_kw}'" + (
+            f" (seed: {seed})" if ai_kw != seed else ""
+        )
+        print(f"  [{i+1}/{len(unique)}] {label}...", end=" ")
+
+        result = check_ai_overview(ai_kw, "studyriserr.com")
+
+        # Tag with seed for reference
+        result["seed"]       = seed
+        result["ai_keyword"] = ai_kw
 
         if result.get("error"):
             print(f"❌ {result['error']}")
         elif result["has_overview"]:
             cited = "🎯 CITED!" if result["site_cited"] else "not cited"
-            print(f"✅ AI Overview exists — {cited}")
+            print(f"✅ AI Overview — {cited}")
         else:
             print("— no AI Overview")
 
         results.append(result)
 
-        # Rate limiting — be respectful to API
-        if i < len(keywords) - 1:
+        # Rate limiting
+        if i < len(unique) - 1:
             time.sleep(1.5)
 
     # Write sheet
@@ -505,5 +596,11 @@ def run_ai_overview_check():
     # Build alert
     alert = build_ai_alert(results)
 
-    print(f"\n✅ AI Overview check complete")
+    # Show credit summary
+    if results:
+        last = results[-1]
+        credits_left = last.get("credits_left", "?")
+        print(f"\n💳 Credits remaining: {credits_left}")
+        print(f"✅ AI Overview check complete — {len(results)} keywords")
+
     return {"results": results, "alert": alert}
