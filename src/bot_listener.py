@@ -179,40 +179,83 @@ async def cmd_targets(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await update.message.reply_text("🎯 Fetching target keyword data...")
 
     try:
-        from src.credentials_loader import setup_credentials  # ← add this
+        from src.credentials_loader import setup_credentials
         from src.target_keywords import run_target_tracker
 
-        setup_credentials()   # ← add this — writes credentials.json from env
-
+        setup_credentials()
         result = run_target_tracker()
 
         if not result:
             await update.message.reply_text("⚠️ No target keywords found.")
             return
 
-        intel = result["intel"]
-        lines = [f"🎯 <b>Target Keywords — Live Status</b>\n"]
+        intel  = result["intel"]
+        groups = result.get("groups", [])
+
+        # ── Section 1: Seed group summary ─────────────────────────────
+        expanded = [g for g in groups if g["mode"] == "expanded"]
+        if expanded:
+            summary_lines = ["🔍 <b>Seed Group Summary</b>\n"]
+            for g in expanded:
+                summary_lines.append(
+                    f"🌱 <b>{g['seed']}</b>\n"
+                    f"   Variants: <b>{g['total_variants']}</b>  "
+                    f"Ranking: <b>{g['ranking_count']}</b>\n"
+                    f"   Best: <code>{str(g['best_keyword'])[:35]}</code> "
+                    f"@ Pos <b>{g['best_position']}</b>\n"
+                    f"   Clicks: <b>{g['total_clicks']}</b>  "
+                    f"CTR: {g['avg_ctr']}%  "
+                    f"{g['top_opportunity']}"
+                )
+            await update.message.reply_text(
+                "\n".join(summary_lines), parse_mode="HTML"
+            )
+
+        # ── Section 2: Individual keywords — chunked ───────────────────
+        header = f"📌 <b>Individual Keywords ({len(intel)} total)</b>\n"
+        chunk  = [header]
+        chunk_size = 0
 
         for k in intel:
             pos = k["current_position"]
-            if pos == "—":
-                zone = "❌"
-            elif pos <= 3:   zone = "🥇"
-            elif pos <= 10:  zone = "🟢"
-            elif pos <= 20:  zone = "🟡"
-            else:            zone = "🔴"
+            if pos == "—":       zone = "❌"
+            elif pos <= 3:       zone = "🥇"
+            elif pos <= 10:      zone = "🟢"
+            elif pos <= 20:      zone = "🟡"
+            else:                zone = "🔴"
 
-            delta = k["delta"]
+            delta     = k["delta"]
             delta_str = f"+{delta}" if delta > 0 else str(delta) if delta != 0 else "—"
 
-            lines.append(
-                f"{zone} <code>{k['keyword'][:38]}</code>\n"
+            seed_tag = f" <i>({k.get('seed', '')})</i>" if k.get("mode") == "expanded" else ""
+
+            entry = (
+                f"{zone} <code>{k['keyword'][:38]}</code>{seed_tag}\n"
                 f"   Pos: <b>{pos}</b>  Δ: <i>{delta_str}</i>  "
                 f"Clicks: {k['clicks_7d']}  CTR: {k['ctr']}%\n"
-                f"   {k['status']}  ·  {k['opportunity']}"
+                f"   {k['status']}  ·  {k['opportunity']}\n"
             )
 
-        await update.message.reply_text("\n".join(lines), parse_mode="HTML")
+            # If adding this entry exceeds limit, send current chunk first
+            if chunk_size + len(entry) > 3800:
+                await update.message.reply_text(
+                    "\n".join(chunk), parse_mode="HTML"
+                )
+                chunk      = []
+                chunk_size = 0
+
+            chunk.append(entry)
+            chunk_size += len(entry)
+
+        # Send remaining chunk
+        if chunk:
+            await update.message.reply_text(
+                "\n".join(chunk), parse_mode="HTML"
+            )
+
+        await update.message.reply_text(
+            f"✅ Done — {len(intel)} keywords tracked"
+        )
 
     except Exception as e:
         await update.message.reply_text(
