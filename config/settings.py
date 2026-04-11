@@ -26,6 +26,9 @@ TEAMS_WEBHOOK_URL = os.environ.get("TEAMS_WEBHOOK_URL", "")
 # ── Thresholds ────────────────────────────────────────────────────────
 POSITION_CHANGE_THRESHOLD = 3
 
+# ── AI OVERVIEW ────────────────────────────────────────────────────────
+SERPAPI_KEY = os.environ.get("SERPAPI_KEY", "")
+
 # ── Dashboard ─────────────────────────────────────────────────────────
 GITHUB_USERNAME = "samir-bit-ctrl"
 GITHUB_REPO     = "rank-tracker"

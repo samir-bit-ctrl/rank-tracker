@@ -262,6 +262,48 @@ async def cmd_targets(update: Update, context: ContextTypes.DEFAULT_TYPE):
             f"❌ Error:\n<code>{e}</code>", parse_mode="HTML"
         )
 
+async def cmd_aioverview(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """Manually trigger AI Overview check."""
+    await update.message.reply_text(
+        "🤖 Running AI Overview check...\n"
+        "⏱️ This takes ~2 mins (rate limiting). Please wait."
+    )
+
+    try:
+        from src.credentials_loader import setup_credentials
+        from src.ai_overview import run_ai_overview_check
+
+        setup_credentials()
+        result = run_ai_overview_check()
+
+        if not result:
+            await update.message.reply_text(
+                "⚠️ No results — check SERPAPI_KEY is set."
+            )
+            return
+
+        # Send alert
+        alert = result.get("alert", "")
+        if alert:
+            # Split if too long
+            if len(alert) > 3800:
+                chunks = [alert[i:i+3800]
+                          for i in range(0, len(alert), 3800)]
+                for chunk in chunks:
+                    await update.message.reply_text(
+                        chunk, parse_mode="HTML"
+                    )
+            else:
+                await update.message.reply_text(
+                    alert, parse_mode="HTML"
+                )
+
+        await update.message.reply_text("✅ AI Overview check complete!")
+
+    except Exception as e:
+        await update.message.reply_text(
+            f"❌ Error:\n<code>{e}</code>", parse_mode="HTML"
+        )
 
 def run_bot():
     """Start the bot in polling mode — blocks until Ctrl+C."""
@@ -278,5 +320,6 @@ def run_bot():
     app.add_handler(CommandHandler("gainers", cmd_gainers))
     app.add_handler(CommandHandler("drops",   cmd_drops))
     app.add_handler(CommandHandler("targets", cmd_targets))
+    app.add_handler(CommandHandler("aioverview", cmd_aioverview))
 
     app.run_polling(allowed_updates=Update.ALL_TYPES)

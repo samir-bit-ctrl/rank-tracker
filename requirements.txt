@@ -6,3 +6,4 @@ python-telegram-bot[job-queue]
 jinja2
 requests
 python-dotenv
+google-search-results

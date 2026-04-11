@@ -10,6 +10,8 @@ from src.telegram_bot import send_report, send_message
 from src.teams_notifier import send_teams_report
 from src.dashboard_gen import generate_dashboard
 from src.target_keywords import run_target_tracker
+from src.ai_overview import run_ai_overview_check
+from datetime import datetime
 
 
 def main():
@@ -17,7 +19,7 @@ def main():
 
     setup_credentials()
 
-    # ── Main rank tracker ─────────────────────────────────────────────
+    # ── Daily: main rank tracker ──────────────────────────────────────
     keywords = fetch_keyword_data()
     if not keywords:
         print("❌ No data fetched. Exiting.")
@@ -32,14 +34,19 @@ def main():
         send_teams_report(report)
         generate_dashboard(report)
 
-    # ── Target keyword tracker ────────────────────────────────────────
+    # ── Daily: target keyword tracker ────────────────────────────────
     result = run_target_tracker()
-
     if result and result["alert"]:
-        send_message(result["alert"])   # separate Telegram alert
-        print("✅ Target keyword alert sent")
+        send_message(result["alert"])
+
+    # ── Weekly: AI Overview check (Mondays only) ──────────────────────
+    if datetime.today().weekday() == 0:   # 0 = Monday
+        print("\n📅 Monday — running weekly AI Overview check...")
+        ai_result = run_ai_overview_check()
+        if ai_result and ai_result["alert"]:
+            send_message(ai_result["alert"])
     else:
-        print("ℹ️  No significant changes in target keywords")
+        print(f"\nℹ️  AI Overview check runs on Mondays only")
 
     print("\n🎉 All done!")
 
