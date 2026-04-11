@@ -10,7 +10,7 @@ DAYS_TO_FETCH    = 7
 MAX_KEYWORDS     = 500
 
 # ── Sheets ────────────────────────────────────────────────────────────
-SHEET_ID              = os.environ.get("SHEET_ID", "1oI1sZyZxeMGLmL4H5TFl-PxOIvEQ3foQ4HreC1UOXV4")
+SHEET_ID              = os.environ.get("SHEET_ID", "")
 SHEET_NAME_DASHBOARD  = "📊 Dashboard"
 SHEET_NAME_DAILY_LOG  = "📈 Daily Log"
 SHEET_NAME_MOVERS     = "🟢 Movers"
