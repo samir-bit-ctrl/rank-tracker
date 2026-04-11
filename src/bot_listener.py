@@ -74,6 +74,8 @@ async def cmd_scan(update: Update, context: ContextTypes.DEFAULT_TYPE):
 async def cmd_status(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """Show info about the last scan."""
     import json, os
+    from src.credentials_loader import setup_credentials
+    setup_credentials()
     history_file = "data/history.json"
 
     if not os.path.exists(history_file):
@@ -99,6 +101,8 @@ async def cmd_status(update: Update, context: ContextTypes.DEFAULT_TYPE):
 async def cmd_top(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """Show top 10 keywords by clicks."""
     import json, os
+    from src.credentials_loader import setup_credentials
+    setup_credentials()
     history_file = "data/history.json"
 
     if not os.path.exists(history_file):
@@ -131,6 +135,8 @@ async def cmd_top(update: Update, context: ContextTypes.DEFAULT_TYPE):
 async def cmd_gainers(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """Show today's top gainers."""
     from src.analyzer import analyze_changes
+    from src.credentials_loader import setup_credentials
+    setup_credentials()
     report = analyze_changes()
 
     if not report or not report["improved"]:
@@ -150,6 +156,8 @@ async def cmd_gainers(update: Update, context: ContextTypes.DEFAULT_TYPE):
 async def cmd_drops(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """Show today's top drops."""
     from src.analyzer import analyze_changes
+    from src.credentials_loader import setup_credentials
+    setup_credentials()
     report = analyze_changes()
 
     if not report or not report["dropped"]:
@@ -171,9 +179,11 @@ async def cmd_targets(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await update.message.reply_text("🎯 Fetching target keyword data...")
 
     try:
-        from src.target_keywords import (
-            run_target_tracker, build_target_alert
-        )
+        from src.credentials_loader import setup_credentials  # ← add this
+        from src.target_keywords import run_target_tracker
+
+        setup_credentials()   # ← add this — writes credentials.json from env
+
         result = run_target_tracker()
 
         if not result:
