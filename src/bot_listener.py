@@ -147,6 +147,24 @@ async def cmd_gainers(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     await update.message.reply_text("\n".join(lines), parse_mode="HTML")
 
+async def cmd_drops(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """Show today's top drops."""
+    from src.analyzer import analyze_changes
+    report = analyze_changes()
+
+    if not report or not report["dropped"]:
+        await update.message.reply_text("📊 No drops detected yet.")
+        return
+
+    lines = [f"📉 <b>Top Drops — {report['today_date']}</b>\n"]
+    for kw in report["dropped"][:10]:
+        lines.append(
+            f"🔴 <code>{kw['keyword'][:40]}</code>\n"
+            f"   {kw['previous_position']} → <b>{kw['position']}</b> "
+            f"<i>({kw['delta']})</i>"
+        )
+
+    await update.message.reply_text("\n".join(lines), parse_mode="HTML")
 
 async def cmd_targets(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """Show live status of all target keywords."""
@@ -207,5 +225,5 @@ def run_bot():
     app.add_handler(CommandHandler("gainers", cmd_gainers))
     app.add_handler(CommandHandler("drops",   cmd_drops))
     app.add_handler(CommandHandler("targets", cmd_targets))
-    
+
     app.run_polling(allowed_updates=Update.ALL_TYPES)
