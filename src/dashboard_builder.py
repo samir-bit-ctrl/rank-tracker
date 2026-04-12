@@ -307,9 +307,11 @@ def _add_chart(spreadsheet, ws_id: int, chart_type: str,
     """
     series = []
     for dr in data_ranges:
+        # Bar charts need BOTTOM_AXIS, all others use LEFT_AXIS
+        target_axis = "BOTTOM_AXIS" if chart_type == "BAR" else "LEFT_AXIS"
         series.append({
             "series": {"sourceRange": {"sources": [dr]}},
-            "targetAxis": "LEFT_AXIS"
+            "targetAxis": target_axis
         })
 
     chart_spec = {
@@ -321,20 +323,26 @@ def _add_chart(spreadsheet, ws_id: int, chart_type: str,
         },
         "backgroundColor": WHITE,
         "basicChart": {
-            "chartType":  chart_type,
+            "chartType":      chart_type,
             "legendPosition": "BOTTOM_LEGEND",
             "axis": [
-                {"position": "BOTTOM_AXIS",
-                 "title": "",
-                 "format": {"fontSize": 8,
-                            "foregroundColor": SUBTLE_TEXT}},
-                {"position": "LEFT_AXIS",
-                 "title": "",
-                 "format": {"fontSize": 8,
-                            "foregroundColor": SUBTLE_TEXT}},
+                {
+                    "position": "BOTTOM_AXIS",
+                    "title": "",
+                    "format": {"fontSize": 8,
+                               "foregroundColor": SUBTLE_TEXT}
+                },
+                {
+                    "position": "LEFT_AXIS",
+                    "title": "",
+                    "format": {"fontSize": 8,
+                               "foregroundColor": SUBTLE_TEXT}
+                },
             ],
             "domains": [{
-                "domain": {"sourceRange": {"sources": [domain_range]}}
+                "domain": {
+                    "sourceRange": {"sources": [domain_range]}
+                }
             }],
             "series":      series,
             "headerCount": 1,
@@ -359,7 +367,6 @@ def _add_chart(spreadsheet, ws_id: int, chart_type: str,
             }
         }
     }
-
 
 def _delete_existing_charts(spreadsheet, ws_id: int) -> list:
     """Return delete requests for all charts on this sheet."""
