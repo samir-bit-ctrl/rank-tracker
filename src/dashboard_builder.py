@@ -256,10 +256,14 @@ def _generate_action_items(keywords: list, report: dict,
 #  CHART DATA HELPERS
 # ══════════════════════════════════════════════════════════════════════
 def _top_keywords_by_clicks(keywords: list, n=10) -> list:
-    return sorted(keywords,
+    SPAM = ["http", "www.", ".com", ".in", ".org", "survey", "whitecastle"]
+    clean = [
+        k for k in keywords
+        if not any(s in k.get("keyword", "").lower() for s in SPAM)
+    ]
+    return sorted(clean,
                   key=lambda x: x.get("clicks", 0),
                   reverse=True)[:n]
-
 
 def _rank_zone_counts(keywords: list) -> dict:
     total = len(keywords) or 1
@@ -508,44 +512,43 @@ def write_full_dashboard(report: dict,
     # These rows feed the charts — they sit below visible area
     # but Google Sheets charts need data ranges
 
-    chart_data_start = len(rows)   # row index where chart data begins
+    chart_data_start = len(rows)
 
-    # Chart 1 data — Avg Position Trend (cols A-B)
-    rows.append(["Date", "Avg Position", "", "",
-                 "Date", "Clicks", "", "",
-                 "Position", "Avg CTR %", "", "",
-                 "Zone", "Count", "", "",
-                 "Keyword", "Clicks", "", ""])
+    # Chart data headers — written to cols A-R (used by charts)
+    rows.append([
+        "Date", "Avg Position", "", "",      # A-D: position trend
+        "Date", "Clicks", "", "",             # E-H: daily clicks
+        "Position", "Avg CTR %", "", "",      # I-L: CTR by position
+        "Zone", "Count", "", "",              # M-P: zone breakdown
+        "Keyword", "Clicks", "", ""           # Q-T: top keywords
+    ])
 
-    for i in range(max(
+    max_rows = max(
         len(pos_trend), len(daily_clicks),
         len(ctr_buckets), len(zones),
         len(top_kws)
-    )):
+    )
+
+    for i in range(max_rows):
         row = [""] * 20
 
-        # Col A-B: position trend
         if i < len(pos_trend):
-            row[0] = pos_trend[i]["date"][-5:]   # MM-DD
+            row[0] = pos_trend[i]["date"][-5:]
             row[1] = pos_trend[i]["avg_position"]
 
-        # Col E-F: daily clicks
         if i < len(daily_clicks):
             row[4] = daily_clicks[i]["date"][-5:]
             row[5] = daily_clicks[i]["clicks"]
 
-        # Col I-J: CTR by position
         if i < len(ctr_buckets):
             row[8]  = ctr_buckets[i]["position"]
             row[9]  = ctr_buckets[i]["avg_ctr"]
 
-        # Col M-N: zone breakdown
         zone_keys = list(zones.keys())
         if i < len(zone_keys):
             row[12] = zone_keys[i]
             row[13] = zones[zone_keys[i]]["count"]
 
-        # Col Q-R: top keywords
         if i < len(top_kws):
             row[16] = top_kws[i]["keyword"][:30]
             row[17] = top_kws[i]["clicks"]
@@ -893,11 +896,38 @@ def write_full_dashboard(report: dict,
             "fields": "pixelSize"
         }})
 
+    # Hide chart data columns (I to T = index 8 to 19)
+    fmt_requests.append({
+        "updateDimensionProperties": {
+            "range": {
+                "sheetId":   sid,
+                "dimension": "COLUMNS",
+                "startIndex": 8,
+                "endIndex":   20
+            },
+            "properties": {"hiddenByUser": True},
+            "fields": "hiddenByUser"
+        }
+    })
+
+    # Set row height for chart data rows to minimum
+    fmt_requests.append({
+        "updateDimensionProperties": {
+            "range": {
+                "sheetId":   sid,
+                "dimension": "ROWS",
+                "startIndex": chart_data_start,
+                "endIndex":   chart_data_end
+            },
+            "properties": {"pixelSize": 18},
+            "fields": "pixelSize"
+        }
+    })
     # Apply all formatting
     spreadsheet.batch_update({"requests": fmt_requests})
 
     # ══════════════════════════════════════════════════════════════════
-    #  CHARTS
+    #  CHARTS — properly spaced, 2 per row
     # ══════════════════════════════════════════════════════════════════
     def _range(col_start, col_end, row_start, row_end):
         return {
@@ -908,34 +938,46 @@ def write_full_dashboard(report: dict,
             "endColumnIndex":   col_end,
         }
 
-    data_row_start = chart_data_start + 1   # skip header row
+    data_row_start = chart_data_start + 1
     data_row_end   = chart_data_end
+
+    # Chart anchor rows — spaced 20 rows apart, starting after stat rows
+    CHART_ROW_1 = 9    # Row 1 of charts
+    CHART_ROW_2 = 30   # Row 2 of charts
+    CHART_ROW_3 = 51   # Row 3 of charts
+
+    CHART_W_HALF = 500   # half width charts
+    CHART_W_FULL = 700   # full width
+    CHART_H      = 280   # height
 
     chart_requests = []
 
-    # Chart 1 — Avg Position Trend (line)
+    # Delete old charts
+    chart_requests.extend(_delete_existing_charts(spreadsheet, sid))
+
+    # ── Row 1 Left: Avg Position Trend ────────────────────────────────
     chart_requests.append(_add_chart(
         spreadsheet, sid,
         chart_type   = "LINE",
-        title        = "📈 Avg Position Trend (Lower = Better)",
+        title        = "📈 Avg Position Trend (14 days)",
         domain_range = _range(0, 1, chart_data_start, data_row_end),
         data_ranges  = [_range(1, 2, chart_data_start, data_row_end)],
-        position     = {"row": 8, "col": 0,
-                        "width": 480, "height": 260}
+        position     = {"row": CHART_ROW_1, "col": 0,
+                        "width": CHART_W_HALF, "height": CHART_H}
     ))
 
-    # Chart 2 — Daily Clicks Trend (area/line)
+    # ── Row 1 Right: Daily Clicks Trend ───────────────────────────────
     chart_requests.append(_add_chart(
         spreadsheet, sid,
         chart_type   = "AREA",
-        title        = "🖱️ Daily Clicks Trend",
+        title        = "🖱️ Daily Clicks Trend (14 days)",
         domain_range = _range(4, 5, chart_data_start, data_row_end),
         data_ranges  = [_range(5, 6, chart_data_start, data_row_end)],
-        position     = {"row": 8, "col": 6,
-                        "width": 480, "height": 260}
+        position     = {"row": CHART_ROW_1, "col": 5,
+                        "width": CHART_W_HALF, "height": CHART_H}
     ))
 
-    # Chart 3 — Rank Zone Distribution (pie)
+    # ── Row 2 Left: Rank Zone Pie ─────────────────────────────────────
     chart_requests.append({
         "addChart": {
             "chart": {
@@ -950,12 +992,14 @@ def write_full_dashboard(report: dict,
                         "legendPosition": "RIGHT_LEGEND",
                         "domain": {
                             "sourceRange": {"sources": [
-                                _range(12, 13, chart_data_start, data_row_end)
+                                _range(12, 13, chart_data_start,
+                                       data_row_end)
                             ]}
                         },
                         "series": {
                             "sourceRange": {"sources": [
-                                _range(13, 14, chart_data_start, data_row_end)
+                                _range(13, 14, chart_data_start,
+                                       data_row_end)
                             ]}
                         },
                         "threeDimensional": False,
@@ -965,37 +1009,37 @@ def write_full_dashboard(report: dict,
                     "overlayPosition": {
                         "anchorCell": {
                             "sheetId":     sid,
-                            "rowIndex":    22,
+                            "rowIndex":    CHART_ROW_2,
                             "columnIndex": 0,
                         },
-                        "widthPixels":  380,
-                        "heightPixels": 260,
+                        "widthPixels":  CHART_W_HALF,
+                        "heightPixels": CHART_H,
                     }
                 }
             }
         }
     })
 
-    # Chart 4 — Top Keywords by Clicks (bar)
+    # ── Row 2 Right: Top Keywords by Clicks ───────────────────────────
     chart_requests.append(_add_chart(
         spreadsheet, sid,
         chart_type   = "BAR",
         title        = "🏆 Top 10 Keywords by Clicks",
         domain_range = _range(16, 17, chart_data_start, data_row_end),
         data_ranges  = [_range(17, 18, chart_data_start, data_row_end)],
-        position     = {"row": 22, "col": 5,
-                        "width": 580, "height": 260}
+        position     = {"row": CHART_ROW_2, "col": 5,
+                        "width": CHART_W_HALF, "height": CHART_H}
     ))
 
-    # Chart 5 — CTR by Position (column)
+    # ── Row 3 Centre: CTR by Position ────────────────────────────────
     chart_requests.append(_add_chart(
         spreadsheet, sid,
         chart_type   = "COLUMN",
-        title        = "📊 Avg CTR % by Position",
+        title        = "📊 Avg CTR % by Position (1-20)",
         domain_range = _range(8, 9, chart_data_start, data_row_end),
         data_ranges  = [_range(9, 10, chart_data_start, data_row_end)],
-        position     = {"row": 36, "col": 0,
-                        "width": 580, "height": 260}
+        position     = {"row": CHART_ROW_3, "col": 0,
+                        "width": CHART_W_FULL, "height": CHART_H}
     ))
 
     # Apply charts
@@ -1004,4 +1048,4 @@ def write_full_dashboard(report: dict,
     print("✅ Full dashboard written with 5 charts")
     print(f"   Health Score : {health['score']}/100 {health['label']}")
     print(f"   Action Items : {len(actions)}")
-    print(f"   Charts       : 5")
+    print(f"   Charts       : 5 (properly spaced)")
