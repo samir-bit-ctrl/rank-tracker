@@ -11,15 +11,15 @@ from src.teams_notifier import send_teams_report
 from src.dashboard_gen import generate_dashboard
 from src.target_keywords import run_target_tracker
 from src.ai_overview import run_ai_overview_check
+from src.dashboard_builder import write_full_dashboard
 from datetime import datetime
 
 
 def main():
     print("🚀 Rank Tracker starting...\n")
-
     setup_credentials()
 
-    # ── Daily: main rank tracker ──────────────────────────────────────
+    # ── Fetch & analyze ───────────────────────────────────────────────
     keywords = fetch_keyword_data()
     if not keywords:
         print("❌ No data fetched. Exiting.")
@@ -28,25 +28,36 @@ def main():
     save_history(keywords)
     report = analyze_changes()
 
-    if report:
-        write_all_sheets(report)
-        send_report(report)
-        send_teams_report(report)
-        generate_dashboard(report)
+    if not report:
+        return
 
-    # ── Daily: target keyword tracker ────────────────────────────────
-    result = run_target_tracker()
-    if result and result["alert"]:
-        send_message(result["alert"])
+    # ── Other sheets ──────────────────────────────────────────────────
+    write_all_sheets(report)
+    send_report(report)
+    send_teams_report(report)
+    generate_dashboard(report)
 
-    # ── Weekly: AI Overview check (Mondays only) ──────────────────────
-    if datetime.today().weekday() == 0:   # 0 = Monday
-        print("\n📅 Monday — running weekly AI Overview check...")
-        ai_result = run_ai_overview_check()
+    # ── Target keywords ───────────────────────────────────────────────
+    target_result = run_target_tracker()
+    target_intel  = target_result["intel"] if target_result else []
+    if target_result and target_result["alert"]:
+        send_message(target_result["alert"])
+
+    # ── AI Overview (Mondays only) ────────────────────────────────────
+    ai_result  = None
+    ai_results = []
+    if datetime.today().weekday() == 0:
+        ai_result  = run_ai_overview_check()
+        ai_results = ai_result["results"] if ai_result else []
         if ai_result and ai_result["alert"]:
             send_message(ai_result["alert"])
-    else:
-        print(f"\nℹ️  AI Overview check runs on Mondays only")
+
+    # ── Full dashboard (replaces old dashboard tab) ───────────────────
+    write_full_dashboard(
+        report       = report,
+        target_intel = target_intel,
+        ai_results   = ai_results
+    )
 
     print("\n🎉 All done!")
 
