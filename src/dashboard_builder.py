@@ -514,9 +514,7 @@ def write_full_dashboard(report: dict,
     # ══════════════════════════════════════════════════════════════════
     fmt_requests = []
 
-    # Delete old charts first
-    fmt_requests.extend(_delete_existing_charts(spreadsheet, sid))
-
+    
     # Whole sheet background
     fmt_requests.append({"repeatCell": {
         "range": {"sheetId": sid},

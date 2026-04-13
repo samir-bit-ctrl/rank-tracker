@@ -13,7 +13,7 @@ from src.target_keywords import run_target_tracker
 from src.ai_overview import run_ai_overview_check
 from src.dashboard_builder import write_full_dashboard
 from datetime import datetime
-
+from src.data_exporter import export_all_data
 
 def main():
     print("🚀 Rank Tracker starting...\n")
@@ -52,13 +52,17 @@ def main():
         if ai_result and ai_result["alert"]:
             send_message(ai_result["alert"])
 
-    # ── Full dashboard (replaces old dashboard tab) ───────────────────
-    write_full_dashboard(
+   
+    # After all other calls:
+    export_all_data(
         report       = report,
         target_intel = target_intel,
         ai_results   = ai_results
     )
 
+
+
+    
     print("\n🎉 All done!")
 
 
