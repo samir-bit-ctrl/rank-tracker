@@ -754,33 +754,6 @@ def write_full_dashboard(report: dict,
             "fields": "pixelSize"
         }})
 
-    # Hide chart data columns (I to T = index 8 to 19)
-    fmt_requests.append({
-        "updateDimensionProperties": {
-            "range": {
-                "sheetId":   sid,
-                "dimension": "COLUMNS",
-                "startIndex": 8,
-                "endIndex":   20
-            },
-            "properties": {"hiddenByUser": True},
-            "fields": "hiddenByUser"
-        }
-    })
-
-    # Set row height for chart data rows to minimum
-    fmt_requests.append({
-        "updateDimensionProperties": {
-            "range": {
-                "sheetId":   sid,
-                "dimension": "ROWS",
-                "startIndex": chart_data_start,
-                "endIndex":   chart_data_end
-            },
-            "properties": {"pixelSize": 18},
-            "fields": "pixelSize"
-        }
-    })
     # Apply all formatting
     spreadsheet.batch_update({"requests": fmt_requests})
     

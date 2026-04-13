@@ -13,6 +13,7 @@ from src.ai_overview import run_ai_overview_check
 from src.dashboard_builder import write_full_dashboard
 from datetime import datetime
 from src.data_exporter import export_all_data
+from src.dashboard_builder import write_full_dashboard
 
 def main():
     print("🚀 Rank Tracker starting...\n")
@@ -51,7 +52,14 @@ def main():
         if ai_result and ai_result["alert"]:
             send_message(ai_result["alert"])
 
-   
+   # main.py should have this:
+
+    # And in main():
+    write_full_dashboard(
+        report       = report,
+        target_intel = target_intel,
+        ai_results   = ai_results
+    )
     # After all other calls:
     export_all_data(
         report       = report,
