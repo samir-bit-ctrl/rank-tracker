@@ -5,24 +5,35 @@ from datetime import datetime
 HISTORY_FILE = "data/history.json"
 
 
-def load_history():
-    """Load existing history from JSON file."""
+def load_history() -> dict:
     if not os.path.exists(HISTORY_FILE):
         return {}
-    with open(HISTORY_FILE, "r") as f:
-        return json.load(f)
-
+    try:
+        with open(HISTORY_FILE, "r") as f:
+            return json.load(f)
+    except (json.JSONDecodeError, ValueError) as e:
+        print(f"⚠️  history.json corrupted ({e}) — starting fresh")
+        # Backup the corrupted file
+        backup = HISTORY_FILE + ".corrupted"
+        os.rename(HISTORY_FILE, backup)
+        print(f"   Corrupted file saved as {backup}")
+        return {}
 
 def save_history(data: list):
-    """Save today's fetch into history."""
+    """Save today's fetch into history — atomic write to prevent corruption."""
     os.makedirs("data", exist_ok=True)
     history = load_history()
 
     today = datetime.today().strftime("%Y-%m-%d")
     history[today] = {row["keyword"]: row for row in data}
 
-    with open(HISTORY_FILE, "w") as f:
+    # Write to temp file first, then rename (atomic — prevents partial writes)
+    tmp_file = HISTORY_FILE + ".tmp"
+    with open(tmp_file, "w") as f:
         json.dump(history, f, indent=2)
+
+    # Only replace original after successful write
+    os.replace(tmp_file, HISTORY_FILE)
 
     print(f"✅ History saved for {today} ({len(data)} keywords)")
     return today
