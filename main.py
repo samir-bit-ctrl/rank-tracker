@@ -8,7 +8,6 @@ from src.analyzer import analyze_changes
 from src.sheets_writer import write_all_sheets
 from src.telegram_bot import send_report, send_message
 from src.teams_notifier import send_teams_report
-from src.dashboard_gen import generate_dashboard
 from src.target_keywords import run_target_tracker
 from src.ai_overview import run_ai_overview_check
 from src.dashboard_builder import write_full_dashboard
@@ -35,7 +34,7 @@ def main():
     write_all_sheets(report)
     send_report(report)
     send_teams_report(report)
-    generate_dashboard(report)
+    
 
     # ── Target keywords ───────────────────────────────────────────────
     target_result = run_target_tracker()
