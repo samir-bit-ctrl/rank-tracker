@@ -1,0 +1,180 @@
+{
+  "updated": "2026-04-13 19:30",
+  "site": "studyriserr.com",
+  "health": {
+    "score": 93,
+    "label": "Excellent"
+  },
+  "stats": {
+    "total_keywords": 478,
+    "avg_position": 5.2,
+    "total_clicks": 1326,
+    "total_impressions": 147836,
+    "avg_ctr": 30.68,
+    "improved": 0,
+    "dropped": 0,
+    "new_today": 478,
+    "lost_today": 0,
+    "top3": 182,
+    "top10": 445
+  },
+  "zones": [
+    {
+      "label": "Top 3",
+      "count": 182,
+      "pct": 38.1
+    },
+    {
+      "label": "4\u201310",
+      "count": 263,
+      "pct": 55.0
+    },
+    {
+      "label": "11\u201320",
+      "count": 28,
+      "pct": 5.9
+    },
+    {
+      "label": "21\u201350",
+      "count": 4,
+      "pct": 0.8
+    },
+    {
+      "label": "50+",
+      "count": 1,
+      "pct": 0.2
+    }
+  ],
+  "pos_trend": [
+    {
+      "date": "04-13",
+      "value": 5.2
+    }
+  ],
+  "clicks_trend": [
+    {
+      "date": "04-13",
+      "value": 1489
+    }
+  ],
+  "ctr_by_pos": [
+    {
+      "position": 1,
+      "ctr": 30.82
+    },
+    {
+      "position": 2,
+      "ctr": 27.66
+    },
+    {
+      "position": 3,
+      "ctr": 33.6
+    },
+    {
+      "position": 4,
+      "ctr": 31.29
+    },
+    {
+      "position": 5,
+      "ctr": 27.94
+    },
+    {
+      "position": 6,
+      "ctr": 20.74
+    },
+    {
+      "position": 7,
+      "ctr": 19.35
+    },
+    {
+      "position": 8,
+      "ctr": 28.59
+    },
+    {
+      "position": 9,
+      "ctr": 26.44
+    },
+    {
+      "position": 10,
+      "ctr": 47.94
+    },
+    {
+      "position": 11,
+      "ctr": 64.53
+    },
+    {
+      "position": 12,
+      "ctr": 70.5
+    },
+    {
+      "position": 13,
+      "ctr": 75.0
+    },
+    {
+      "position": 17,
+      "ctr": 100.0
+    },
+    {
+      "position": 19,
+      "ctr": 57.14
+    },
+    {
+      "position": 20,
+      "ctr": 100.0
+    }
+  ],
+  "top_keywords": [
+    {
+      "keyword": "shivaji university exam time table 2026",
+      "clicks": 97,
+      "position": 2.3
+    },
+    {
+      "keyword": "lpunest result 2026",
+      "clicks": 22,
+      "position": 8.6
+    },
+    {
+      "keyword": "tait exam date 2026",
+      "clicks": 21,
+      "position": 6.2
+    },
+    {
+      "keyword": "mba cet admit card 2026",
+      "clicks": 19,
+      "position": 2.0
+    },
+    {
+      "keyword": "uttar pradesh government reopens student scholarship portal for 2025-26 academic session",
+      "clicks": 18,
+      "position": 6.8
+    },
+    {
+      "keyword": "shivaji university hall ticket 2026",
+      "clicks": 17,
+      "position": 8.3
+    },
+    {
+      "keyword": "ignou bed admission 2026",
+      "clicks": 16,
+      "position": 1.4
+    },
+    {
+      "keyword": "aiapget 2026 exam date",
+      "clicks": 15,
+      "position": 5.9
+    },
+    {
+      "keyword": "osstet admit card 2025",
+      "clicks": 15,
+      "position": 4.9
+    },
+    {
+      "keyword": "tancet 2026 syllabus",
+      "clicks": 15,
+      "position": 5.1
+    }
+  ],
+  "improved": [],
+  "dropped": []
+}
