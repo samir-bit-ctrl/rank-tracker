@@ -1,38 +1,38 @@
 {
-  "updated": "2026-04-13 20:00",
+  "updated": "2026-04-14 08:16",
   "site": "studyriserr.com",
   "health": {
     "score": 93,
     "label": "Excellent"
   },
   "stats": {
-    "total_keywords": 478,
-    "avg_position": 5.2,
-    "total_clicks": 1326,
-    "total_impressions": 147836,
-    "avg_ctr": 30.68,
+    "total_keywords": 474,
+    "avg_position": 4.9,
+    "total_clicks": 2127,
+    "total_impressions": 168033,
+    "avg_ctr": 29.94,
     "improved": 0,
-    "dropped": 0,
-    "new_today": 478,
-    "lost_today": 0,
-    "top3": 182,
-    "top10": 445
+    "dropped": 1,
+    "new_today": 65,
+    "lost_today": 69,
+    "top3": 189,
+    "top10": 442
   },
   "zones": [
     {
       "label": "Top 3",
-      "count": 182,
-      "pct": 38.1
+      "count": 189,
+      "pct": 39.9
     },
     {
       "label": "4\u201310",
-      "count": 263,
-      "pct": 55.0
+      "count": 253,
+      "pct": 53.4
     },
     {
       "label": "11\u201320",
-      "count": 28,
-      "pct": 5.9
+      "count": 27,
+      "pct": 5.7
     },
     {
       "label": "21\u201350",
@@ -49,66 +49,74 @@
     {
       "date": "04-13",
       "value": 5.2
+    },
+    {
+      "date": "04-14",
+      "value": 4.9
     }
   ],
   "clicks_trend": [
     {
       "date": "04-13",
       "value": 1489
+    },
+    {
+      "date": "04-14",
+      "value": 2309
     }
   ],
   "ctr_by_pos": [
     {
       "position": 1,
-      "ctr": 30.82
+      "ctr": 32.35
     },
     {
       "position": 2,
-      "ctr": 27.66
+      "ctr": 22.43
     },
     {
       "position": 3,
-      "ctr": 33.6
+      "ctr": 26.02
     },
     {
       "position": 4,
-      "ctr": 31.29
+      "ctr": 26.07
     },
     {
       "position": 5,
-      "ctr": 27.94
+      "ctr": 28.97
     },
     {
       "position": 6,
-      "ctr": 20.74
+      "ctr": 25.41
     },
     {
       "position": 7,
-      "ctr": 19.35
+      "ctr": 26.07
     },
     {
       "position": 8,
-      "ctr": 28.59
+      "ctr": 33.9
     },
     {
       "position": 9,
-      "ctr": 26.44
+      "ctr": 29.93
     },
     {
       "position": 10,
-      "ctr": 47.94
+      "ctr": 42.96
     },
     {
       "position": 11,
-      "ctr": 64.53
+      "ctr": 45.68
     },
     {
       "position": 12,
-      "ctr": 70.5
+      "ctr": 70.0
     },
     {
       "position": 13,
-      "ctr": 75.0
+      "ctr": 83.33
     },
     {
       "position": 17,
@@ -125,56 +133,63 @@
   ],
   "top_keywords": [
     {
-      "keyword": "shivaji university exam time table 2026",
-      "clicks": 97,
-      "position": 2.3
+      "keyword": "ssc gd slot booking 2026 link",
+      "clicks": 472,
+      "position": 2.2
     },
     {
-      "keyword": "lpunest result 2026",
-      "clicks": 22,
-      "position": 8.6
+      "keyword": "ssc gd slot booking link",
+      "clicks": 102,
+      "position": 1.8
+    },
+    {
+      "keyword": "shivaji university exam time table 2026",
+      "clicks": 84,
+      "position": 2.5
+    },
+    {
+      "keyword": "ssc gd slot booking 2026",
+      "clicks": 80,
+      "position": 4.2
+    },
+    {
+      "keyword": "ssc gd slot booking",
+      "clicks": 51,
+      "position": 6.4
+    },
+    {
+      "keyword": "ssc gd slot booking date 2026 link",
+      "clicks": 39,
+      "position": 3.4
+    },
+    {
+      "keyword": "ssc gd slot booking link 2026",
+      "clicks": 32,
+      "position": 2.2
     },
     {
       "keyword": "tait exam date 2026",
-      "clicks": 21,
-      "position": 6.2
+      "clicks": 20,
+      "position": 6.1
     },
     {
       "keyword": "mba cet admit card 2026",
       "clicks": 19,
-      "position": 2.0
+      "position": 1.9
     },
     {
-      "keyword": "uttar pradesh government reopens student scholarship portal for 2025-26 academic session",
-      "clicks": 18,
-      "position": 6.8
-    },
-    {
-      "keyword": "shivaji university hall ticket 2026",
+      "keyword": "ssc slot booking 2026",
       "clicks": 17,
-      "position": 8.3
-    },
-    {
-      "keyword": "ignou bed admission 2026",
-      "clicks": 16,
-      "position": 1.4
-    },
-    {
-      "keyword": "aiapget 2026 exam date",
-      "clicks": 15,
-      "position": 5.9
-    },
-    {
-      "keyword": "osstet admit card 2025",
-      "clicks": 15,
-      "position": 4.9
-    },
-    {
-      "keyword": "tancet 2026 syllabus",
-      "clicks": 15,
-      "position": 5.1
+      "position": 3.4
     }
   ],
   "improved": [],
-  "dropped": []
+  "dropped": [
+    {
+      "keyword": "bennett university admission",
+      "prev": 12.1,
+      "current": 17,
+      "delta": -4.9
+    }
+  ]
 }
