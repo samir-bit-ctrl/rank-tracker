@@ -1,43 +1,43 @@
 {
-  "updated": "2026-04-15 08:19",
+  "updated": "2026-04-16 08:20",
   "site": "studyriserr.com",
   "health": {
     "score": 93,
     "label": "Excellent"
   },
   "stats": {
-    "total_keywords": 474,
-    "avg_position": 5.0,
-    "total_clicks": 2266,
-    "total_impressions": 176754,
-    "avg_ctr": 30.32,
-    "improved": 0,
+    "total_keywords": 473,
+    "avg_position": 5.2,
+    "total_clicks": 2355,
+    "total_impressions": 171284,
+    "avg_ctr": 30.21,
+    "improved": 1,
     "dropped": 0,
-    "new_today": 45,
-    "lost_today": 45,
-    "top3": 179,
-    "top10": 443
+    "new_today": 50,
+    "lost_today": 51,
+    "top3": 174,
+    "top10": 439
   },
   "zones": [
     {
       "label": "Top 3",
-      "count": 179,
-      "pct": 37.8
+      "count": 174,
+      "pct": 36.8
     },
     {
       "label": "4\u201310",
-      "count": 264,
-      "pct": 55.7
+      "count": 265,
+      "pct": 56.0
     },
     {
       "label": "11\u201320",
-      "count": 27,
-      "pct": 5.7
+      "count": 28,
+      "pct": 5.9
     },
     {
       "label": "21\u201350",
-      "count": 3,
-      "pct": 0.6
+      "count": 5,
+      "pct": 1.1
     },
     {
       "label": "50+",
@@ -57,6 +57,10 @@
     {
       "date": "04-15",
       "value": 4.9
+    },
+    {
+      "date": "04-16",
+      "value": 5.1
     }
   ],
   "clicks_trend": [
@@ -71,52 +75,56 @@
     {
       "date": "04-15",
       "value": 2465
+    },
+    {
+      "date": "04-16",
+      "value": 2572
     }
   ],
   "ctr_by_pos": [
     {
       "position": 1,
-      "ctr": 33.38
+      "ctr": 33.49
     },
     {
       "position": 2,
-      "ctr": 26.62
+      "ctr": 20.93
     },
     {
       "position": 3,
-      "ctr": 30.15
+      "ctr": 32.57
     },
     {
       "position": 4,
-      "ctr": 26.43
+      "ctr": 26.67
     },
     {
       "position": 5,
-      "ctr": 23.82
+      "ctr": 25.72
     },
     {
       "position": 6,
-      "ctr": 21.21
+      "ctr": 21.37
     },
     {
       "position": 7,
-      "ctr": 24.61
+      "ctr": 21.38
     },
     {
       "position": 8,
-      "ctr": 32.25
+      "ctr": 39.54
     },
     {
       "position": 9,
-      "ctr": 24.45
+      "ctr": 22.49
     },
     {
       "position": 10,
-      "ctr": 45.41
+      "ctr": 41.28
     },
     {
       "position": 11,
-      "ctr": 54.87
+      "ctr": 55.27
     },
     {
       "position": 12,
@@ -128,7 +136,7 @@
     },
     {
       "position": 14,
-      "ctr": 100.0
+      "ctr": 57.14
     },
     {
       "position": 16,
@@ -139,8 +147,12 @@
       "ctr": 100.0
     },
     {
+      "position": 18,
+      "ctr": 100.0
+    },
+    {
       "position": 19,
-      "ctr": 57.14
+      "ctr": 100.0
     },
     {
       "position": 20,
@@ -150,18 +162,18 @@
   "top_keywords": [
     {
       "keyword": "ssc gd slot booking 2026 link",
-      "clicks": 565,
-      "position": 2.0
-    },
-    {
-      "keyword": "ssc gd slot booking",
-      "clicks": 115,
-      "position": 7.9
+      "clicks": 604,
+      "position": 1.9
     },
     {
       "keyword": "ssc gd slot booking link",
-      "clicks": 103,
-      "position": 1.8
+      "clicks": 121,
+      "position": 1.7
+    },
+    {
+      "keyword": "ssc gd slot booking",
+      "clicks": 118,
+      "position": 7.8
     },
     {
       "keyword": "ssc gd slot booking 2026",
@@ -170,35 +182,42 @@
     },
     {
       "keyword": "shivaji university exam time table 2026",
-      "clicks": 70,
+      "clicks": 62,
       "position": 2.6
     },
     {
       "keyword": "ssc gd slot booking date 2026 link",
-      "clicks": 42,
-      "position": 3.3
+      "clicks": 43,
+      "position": 3.2
     },
     {
       "keyword": "ssc gd slot booking link 2026",
-      "clicks": 37,
-      "position": 2.3
-    },
-    {
-      "keyword": "tait exam date 2026",
-      "clicks": 19,
-      "position": 6.0
+      "clicks": 38,
+      "position": 2.2
     },
     {
       "keyword": "ssc slot booking 2026",
-      "clicks": 17,
-      "position": 3.6
+      "clicks": 28,
+      "position": 4.7
+    },
+    {
+      "keyword": "tait exam date 2026",
+      "clicks": 21,
+      "position": 6.0
     },
     {
       "keyword": "osstet admit card 2025",
-      "clicks": 16,
-      "position": 4.9
+      "clicks": 17,
+      "position": 5.0
     }
   ],
-  "improved": [],
+  "improved": [
+    {
+      "keyword": "aiims paramedical exam date 2026 exam centre",
+      "prev": 7.5,
+      "current": 3,
+      "delta": 4.5
+    }
+  ],
   "dropped": []
 }
