@@ -1,38 +1,38 @@
 {
-  "updated": "2026-04-16 08:20",
+  "updated": "2026-04-17 08:18",
   "site": "studyriserr.com",
   "health": {
-    "score": 93,
+    "score": 92,
     "label": "Excellent"
   },
   "stats": {
     "total_keywords": 473,
     "avg_position": 5.2,
-    "total_clicks": 2355,
-    "total_impressions": 171284,
-    "avg_ctr": 30.21,
+    "total_clicks": 2855,
+    "total_impressions": 192068,
+    "avg_ctr": 29.11,
     "improved": 1,
     "dropped": 0,
-    "new_today": 50,
-    "lost_today": 51,
-    "top3": 174,
-    "top10": 439
+    "new_today": 56,
+    "lost_today": 56,
+    "top3": 169,
+    "top10": 437
   },
   "zones": [
     {
       "label": "Top 3",
-      "count": 174,
-      "pct": 36.8
+      "count": 169,
+      "pct": 35.7
     },
     {
       "label": "4\u201310",
-      "count": 265,
-      "pct": 56.0
+      "count": 268,
+      "pct": 56.7
     },
     {
       "label": "11\u201320",
-      "count": 28,
-      "pct": 5.9
+      "count": 31,
+      "pct": 6.6
     },
     {
       "label": "21\u201350",
@@ -41,8 +41,8 @@
     },
     {
       "label": "50+",
-      "count": 1,
-      "pct": 0.2
+      "count": 0,
+      "pct": 0.0
     }
   ],
   "pos_trend": [
@@ -60,6 +60,10 @@
     },
     {
       "date": "04-16",
+      "value": 5.1
+    },
+    {
+      "date": "04-17",
       "value": 5.1
     }
   ],
@@ -79,52 +83,56 @@
     {
       "date": "04-16",
       "value": 2572
+    },
+    {
+      "date": "04-17",
+      "value": 3065
     }
   ],
   "ctr_by_pos": [
     {
       "position": 1,
-      "ctr": 33.49
+      "ctr": 27.47
     },
     {
       "position": 2,
-      "ctr": 20.93
+      "ctr": 23.96
     },
     {
       "position": 3,
-      "ctr": 32.57
+      "ctr": 33.29
     },
     {
       "position": 4,
-      "ctr": 26.67
+      "ctr": 24.29
     },
     {
       "position": 5,
-      "ctr": 25.72
+      "ctr": 26.43
     },
     {
       "position": 6,
-      "ctr": 21.37
+      "ctr": 20.41
     },
     {
       "position": 7,
-      "ctr": 21.38
+      "ctr": 23.67
     },
     {
       "position": 8,
-      "ctr": 39.54
+      "ctr": 36.61
     },
     {
       "position": 9,
-      "ctr": 22.49
+      "ctr": 25.34
     },
     {
       "position": 10,
-      "ctr": 41.28
+      "ctr": 36.88
     },
     {
       "position": 11,
-      "ctr": 55.27
+      "ctr": 43.58
     },
     {
       "position": 12,
@@ -136,11 +144,11 @@
     },
     {
       "position": 14,
-      "ctr": 57.14
+      "ctr": 100.0
     },
     {
       "position": 16,
-      "ctr": 100.0
+      "ctr": 75.0
     },
     {
       "position": 17,
@@ -162,61 +170,61 @@
   "top_keywords": [
     {
       "keyword": "ssc gd slot booking 2026 link",
-      "clicks": 604,
-      "position": 1.9
-    },
-    {
-      "keyword": "ssc gd slot booking link",
-      "clicks": 121,
-      "position": 1.7
+      "clicks": 784,
+      "position": 1.8
     },
     {
       "keyword": "ssc gd slot booking",
-      "clicks": 118,
-      "position": 7.8
+      "clicks": 309,
+      "position": 6.9
+    },
+    {
+      "keyword": "ssc gd slot booking link",
+      "clicks": 137,
+      "position": 1.8
     },
     {
       "keyword": "ssc gd slot booking 2026",
-      "clicks": 86,
-      "position": 4.3
-    },
-    {
-      "keyword": "shivaji university exam time table 2026",
-      "clicks": 62,
-      "position": 2.6
-    },
-    {
-      "keyword": "ssc gd slot booking date 2026 link",
-      "clicks": 43,
-      "position": 3.2
-    },
-    {
-      "keyword": "ssc gd slot booking link 2026",
-      "clicks": 38,
-      "position": 2.2
+      "clicks": 113,
+      "position": 4.4
     },
     {
       "keyword": "ssc slot booking 2026",
-      "clicks": 28,
-      "position": 4.7
+      "clicks": 56,
+      "position": 5.5
     },
     {
-      "keyword": "tait exam date 2026",
-      "clicks": 21,
+      "keyword": "shivaji university exam time table 2026",
+      "clicks": 50,
+      "position": 2.8
+    },
+    {
+      "keyword": "ssc gd slot booking date 2026",
+      "clicks": 49,
+      "position": 3.4
+    },
+    {
+      "keyword": "ssc gd slot booking date 2026 link",
+      "clicks": 45,
+      "position": 3.1
+    },
+    {
+      "keyword": "ssc gd slot booking link 2026",
+      "clicks": 40,
+      "position": 2.2
+    },
+    {
+      "keyword": "uk board result 2025 class 10",
+      "clicks": 25,
       "position": 6.0
-    },
-    {
-      "keyword": "osstet admit card 2025",
-      "clicks": 17,
-      "position": 5.0
     }
   ],
   "improved": [
     {
-      "keyword": "aiims paramedical exam date 2026 exam centre",
-      "prev": 7.5,
-      "current": 3,
-      "delta": 4.5
+      "keyword": "central university of punjab hostel fees",
+      "prev": 14,
+      "current": 10.9,
+      "delta": 3.1
     }
   ],
   "dropped": []
