@@ -1,0 +1,248 @@
+{
+  "updated": "2026-05-20 12:50",
+  "site": "studyriserr.com",
+  "health": {
+    "score": 80,
+    "label": "Excellent"
+  },
+  "stats": {
+    "total_keywords": 479,
+    "avg_position": 7.8,
+    "total_clicks": 1351,
+    "total_impressions": 159116,
+    "avg_ctr": 35.92,
+    "improved": 5,
+    "dropped": 2,
+    "new_today": 74,
+    "lost_today": 77,
+    "top3": 92,
+    "top10": 383
+  },
+  "zones": [
+    {
+      "label": "Top 3",
+      "count": 92,
+      "pct": 19.2
+    },
+    {
+      "label": "4\u201310",
+      "count": 291,
+      "pct": 60.8
+    },
+    {
+      "label": "11\u201320",
+      "count": 81,
+      "pct": 16.9
+    },
+    {
+      "label": "21\u201350",
+      "count": 13,
+      "pct": 2.7
+    },
+    {
+      "label": "50+",
+      "count": 2,
+      "pct": 0.4
+    }
+  ],
+  "pos_trend": [
+    {
+      "date": "04-13",
+      "value": 5.2
+    },
+    {
+      "date": "05-19",
+      "value": 7.6
+    },
+    {
+      "date": "05-20",
+      "value": 7.6
+    }
+  ],
+  "clicks_trend": [
+    {
+      "date": "04-13",
+      "value": 1489
+    },
+    {
+      "date": "05-19",
+      "value": 1528
+    },
+    {
+      "date": "05-20",
+      "value": 1504
+    }
+  ],
+  "ctr_by_pos": [
+    {
+      "position": 1,
+      "ctr": 60.5
+    },
+    {
+      "position": 2,
+      "ctr": 38.67
+    },
+    {
+      "position": 3,
+      "ctr": 34.85
+    },
+    {
+      "position": 4,
+      "ctr": 34.46
+    },
+    {
+      "position": 5,
+      "ctr": 25.47
+    },
+    {
+      "position": 6,
+      "ctr": 29.66
+    },
+    {
+      "position": 7,
+      "ctr": 18.76
+    },
+    {
+      "position": 8,
+      "ctr": 26.1
+    },
+    {
+      "position": 9,
+      "ctr": 28.96
+    },
+    {
+      "position": 10,
+      "ctr": 33.85
+    },
+    {
+      "position": 11,
+      "ctr": 31.19
+    },
+    {
+      "position": 12,
+      "ctr": 50.7
+    },
+    {
+      "position": 13,
+      "ctr": 100.0
+    },
+    {
+      "position": 14,
+      "ctr": 29.29
+    },
+    {
+      "position": 15,
+      "ctr": 100.0
+    },
+    {
+      "position": 16,
+      "ctr": 100.0
+    },
+    {
+      "position": 17,
+      "ctr": 77.78
+    },
+    {
+      "position": 20,
+      "ctr": 72.22
+    }
+  ],
+  "top_keywords": [
+    {
+      "keyword": "predeledraj2025",
+      "clicks": 93,
+      "position": 4.5
+    },
+    {
+      "keyword": "soel admission 2026",
+      "clicks": 57,
+      "position": 2.6
+    },
+    {
+      "keyword": "bhc result 2026",
+      "clicks": 50,
+      "position": 6.3
+    },
+    {
+      "keyword": "soel law college admission 2026",
+      "clicks": 48,
+      "position": 3.0
+    },
+    {
+      "keyword": "uk board result 2025",
+      "clicks": 44,
+      "position": 4.6
+    },
+    {
+      "keyword": "aiapget 2026",
+      "clicks": 34,
+      "position": 8.0
+    },
+    {
+      "keyword": "predeledraj2025 in",
+      "clicks": 20,
+      "position": 4.8
+    },
+    {
+      "keyword": "2027 madhyamik exam date",
+      "clicks": 19,
+      "position": 2.0
+    },
+    {
+      "keyword": "ap icet rank wise colleges",
+      "clicks": 17,
+      "position": 5.1
+    },
+    {
+      "keyword": "nta neet 2026 re-exam",
+      "clicks": 17,
+      "position": 1
+    }
+  ],
+  "improved": [
+    {
+      "keyword": "186 marks in bitsat",
+      "prev": 7.6,
+      "current": 1,
+      "delta": 6.6
+    },
+    {
+      "keyword": "cutoff for eamcet 2026",
+      "prev": 6.5,
+      "current": 1,
+      "delta": 5.5
+    },
+    {
+      "keyword": "amrita rank vs percentile 2025",
+      "prev": 6.5,
+      "current": 3,
+      "delta": 3.5
+    },
+    {
+      "keyword": "documents for aiims paramedical",
+      "prev": 4.2,
+      "current": 1,
+      "delta": 3.2
+    },
+    {
+      "keyword": "eamcet cut off marks 2025",
+      "prev": 9.1,
+      "current": 6.1,
+      "delta": 3.0
+    }
+  ],
+  "dropped": [
+    {
+      "keyword": "comedk cutoff 2026",
+      "prev": 16,
+      "current": 26,
+      "delta": -10
+    },
+    {
+      "keyword": "chandigarh university b pharma fees",
+      "prev": 12,
+      "current": 16,
+      "delta": -4
+    }
+  ]
+}

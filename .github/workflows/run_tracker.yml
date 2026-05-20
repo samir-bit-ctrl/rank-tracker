@@ -2,11 +2,11 @@ name: Rank Tracker
 
 on:
   schedule:
-    - cron: '30 2 * * *'   # 8:00 AM IST = 2:30 AM UTC
-  workflow_dispatch:         # allows manual trigger from GitHub UI
+    - cron: '30 2 * * *'
+  workflow_dispatch:
 
 permissions:
-  contents: write            # needed to push dashboard to gh-pages
+  contents: write
 
 jobs:
   run:
@@ -21,19 +21,17 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: '3.11'
+          python-version: '3.12'
 
       - name: Install dependencies
         run: pip install -r requirements.txt
 
       - name: Run rank tracker
         env:
-          GSC_CREDENTIALS:    ${{ secrets.GSC_CREDENTIALS }}
-          SHEET_ID:           ${{ secrets.SHEET_ID }}
-          SITE_URL:           ${{ secrets.SITE_URL }}
-          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
-          TELEGRAM_CHAT_ID:   ${{ secrets.TELEGRAM_CHAT_ID }}
-          TEAMS_WEBHOOK_URL:  ${{ secrets.TEAMS_WEBHOOK_URL }}
+          GSC_CREDENTIALS: ${{ secrets.GSC_CREDENTIALS }}
+          SHEET_ID:        ${{ secrets.SHEET_ID }}
+          SITE_URL:        ${{ secrets.SITE_URL }}
+          SERPAPI_KEY:     ${{ secrets.SERPAPI_KEY }}
         run: python main.py
 
       - name: Commit history back to main
@@ -42,8 +40,7 @@ jobs:
           git config user.email "bot@studyriserr.com"
           git config advice.addIgnoredFile false
           git add -f data/history.json
-          git status
-          git diff --staged --quiet && echo "No changes to commit" || git commit -m "chore: update rank history $(date +'%Y-%m-%d')"
+          git diff --staged --quiet && echo "No changes" || git commit -m "chore: update rank history $(date +'%Y-%m-%d')"
           git push origin main || echo "Nothing to push"
 
       - name: Deploy dashboard to GitHub Pages
@@ -52,3 +49,4 @@ jobs:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir:  ./dashboard
           publish_branch: gh-pages
+          force_orphan: true

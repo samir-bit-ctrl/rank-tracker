@@ -290,6 +290,14 @@ def write_dashboard(spreadsheet, report: dict):
 # ══════════════════════════════════════════════════════════════════════════════
 #  TAB 2 — 📈 DAILY LOG
 # ══════════════════════════════════════════════════════════════════════════════
+def _col_index_to_letter(n: int) -> str:
+    """Convert 1-based column index to letter(s). Handles AA, AB etc."""
+    result = ""
+    while n > 0:
+        n, remainder = divmod(n - 1, 26)
+        result = chr(65 + remainder) + result
+    return result
+
 def write_daily_log(spreadsheet, report: dict):
     ws     = _get_or_create_sheet(spreadsheet, SHEET_NAME_DAILY_LOG)
     sid    = ws.id
@@ -318,7 +326,7 @@ def write_daily_log(spreadsheet, report: dict):
     else:
         # Append a new date column
         col_index = len(existing) + 1
-        col_letter = chr(64 + col_index)  # works up to col Z (26 dates)
+        col_letter = _col_index_to_letter(col_index)
 
         # Get existing keywords in col A
         existing_kws = ws.col_values(1)[1:]   # skip header

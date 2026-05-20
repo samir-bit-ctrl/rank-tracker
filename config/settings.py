@@ -12,16 +12,9 @@ MAX_KEYWORDS     = 500
 # ── Sheets ────────────────────────────────────────────────────────────
 SHEET_ID              = os.environ.get("SHEET_ID", "")
 SHEET_NAME_DASHBOARD  = "📊 Dashboard"
-SHEET_NAME_DAILY_LOG  = "📈 Daily Log"
+SHEET_NAME_DAILY_LOG  = "Daily Log"
 SHEET_NAME_MOVERS     = "🟢 Movers"
 SHEET_NAME_LOST_NEW   = "💀 Lost & New"
-
-# ── Telegram ──────────────────────────────────────────────────────────
-TELEGRAM_BOT_TOKEN = os.environ.get("TELEGRAM_BOT_TOKEN", "")
-TELEGRAM_CHAT_ID   = os.environ.get("TELEGRAM_CHAT_ID", "")
-
-# ── Teams ─────────────────────────────────────────────────────────────
-TEAMS_WEBHOOK_URL = os.environ.get("TEAMS_WEBHOOK_URL", "")
 
 # ── Thresholds ────────────────────────────────────────────────────────
 POSITION_CHANGE_THRESHOLD = 3
