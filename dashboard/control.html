@@ -554,6 +554,15 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-body);display
 </div>
 
 <script>
+
+// Wake up Render on page load (prevents cold start delay on first button click)
+async function wakeUpApi() {
+  if (!API_URL) return;
+  try {
+    await fetch(API_URL + '/', { signal: AbortSignal.timeout(10000) });
+  } catch {}
+}
+wakeUpApi();
 // ── Config ────────────────────────────────────────────────────────
 // Set your Railway API URL here after deploying api_server.py
 const API_URL = 'https://rank-tracker-api-aa7k.onrender.com';
@@ -586,7 +595,7 @@ async function checkApiStatus() {
   }
 
   try {
-    const r = await fetch(API_URL + '/health', { signal: AbortSignal.timeout(3000) });
+    const r = await fetch(API_URL + '/', { signal: AbortSignal.timeout(3000) });
     if (r.ok) {
       dot.className    = 'status-dot online';
       text.textContent = 'API online';
@@ -644,6 +653,18 @@ function clearResults() {
 }
 
 // ── Main command router ───────────────────────────────────────────
+function cmdToEndpoint(cmd) {
+  const map = {
+    'full-scan':  'scan',
+    'status':     'status',
+    'top':        'top',
+    'gainers':    'gainers',
+    'drops':      'drops',
+    'targets':    'targets',
+    'aioverview': 'ai-scan',
+  };
+  return map[cmd] || cmd;
+}
 async function runCommand(cmd) {
   const btnMap = {
     'full-scan':  'btn-full-scan',
@@ -689,8 +710,9 @@ function cmdTitle(cmd) {
 // ── API mode ──────────────────────────────────────────────────────
 async function runViaApi(cmd) {
   const body = document.getElementById('results-body');
+  const isPost = ['full-scan', 'aioverview'].includes(cmd);
 
-  // Show log stream while running
+  // Show log stream
   body.innerHTML = `
     <div class="result-block">
       <div class="result-block-header">
@@ -708,32 +730,53 @@ async function runViaApi(cmd) {
     </div>`;
 
   const log = document.getElementById('log-stream');
-
   function addLog(msg, type='') {
     const cursor = log.querySelector('.log-cursor');
     const line   = document.createElement('span');
-    line.className = `log-line ${type}`;
+    line.className   = `log-line ${type}`;
     line.textContent = msg;
     if (cursor) log.insertBefore(line, cursor);
     else log.appendChild(line);
     log.scrollTop = log.scrollHeight;
   }
 
-  addLog('▶ Sending command to Railway API...', 'info');
+  addLog('▶ Sending request...', 'info');
 
-  const response = await fetch(`${API_URL}/run/${cmd}`, {
-    method: 'POST',
+  const endpoint = cmdToEndpoint(cmd);
+  const response = await fetch(`${API_URL}/${endpoint}`, {
+    method: isPost ? 'POST' : 'GET',
     headers: { 'Content-Type': 'application/json' },
   });
 
   if (!response.ok) throw new Error(`API returned ${response.status}`);
 
   const data = await response.json();
+  addLog('✓ Response received', 'success');
 
-  addLog('✓ Command completed', 'success');
+  // For POST jobs, poll for completion
+  if (isPost) {
+    addLog('⏳ Job running in background...', 'info');
+    await pollJobCompletion(addLog);
+  } else {
+    setTimeout(() => renderApiResult(cmd, data), 300);
+  }
+}
 
-  // Render structured result
-  setTimeout(() => renderApiResult(cmd, data), 300);
+async function pollJobCompletion(addLog) {
+  return new Promise((resolve) => {
+    const interval = setInterval(async () => {
+      try {
+        const r    = await fetch(`${API_URL}/job-status`);
+        const data = await r.json();
+        if (!data.running && data.last_result) {
+          clearInterval(interval);
+          addLog('✅ Job complete!', 'success');
+          setTimeout(() => renderApiResult('full-scan', data.last_result), 300);
+          resolve();
+        }
+      } catch {}
+    }, 2500);
+  });
 }
 
 function renderApiResult(cmd, data) {
