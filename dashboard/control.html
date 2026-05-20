@@ -28,9 +28,9 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-body);display
 ::-webkit-scrollbar-thumb{background:#cbd5e1;border-radius:3px}
 
 /* ── Sidebar ── */
-.sidebar{width:var(--sb-w);background:var(--sb-bg);border-right:1px solid var(--sb-border);display:flex;flex-direction:column;position:fixed;top:0;left:0;bottom:0;z-index:100;overflow-y:auto}
+.sidebar{width:var(--sb-w);background:linear-gradient(180deg,#0d1020 0%,#0f1117 100%);border-right:1px solid var(--sb-border);display:flex;flex-direction:column;position:fixed;top:0;left:0;bottom:0;z-index:100;overflow-y:auto}
 .sb-logo{padding:24px 20px 20px;border-bottom:1px solid var(--sb-border)}
-.sb-logo-mark{width:36px;height:36px;background:var(--sb-accent);border-radius:9px;display:flex;align-items:center;justify-content:center;font-family:var(--font-display);font-size:16px;font-weight:800;color:#fff;margin-bottom:10px}
+.sb-logo-mark{width:36px;height:36px;background:linear-gradient(135deg,#3b82f6,#6366f1);border-radius:9px;display:flex;align-items:center;justify-content:center;font-family:var(--font-display);font-size:16px;font-weight:800;color:#fff;margin-bottom:10px;box-shadow:0 4px 12px rgba(59,130,246,.35)}
 .sb-site{font-family:var(--font-display);font-size:13px;font-weight:700;color:var(--sb-active)}
 .sb-tagline{font-size:10px;color:var(--sb-text);margin-top:2px;font-family:var(--font-mono)}
 .sb-nav{padding:16px 12px;flex:1}
@@ -49,7 +49,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-body);display
 
 /* ── Main ── */
 .main{margin-left:var(--sb-w);flex:1;min-height:100vh}
-.topbar{background:var(--surface);border-bottom:1px solid var(--border);padding:0 32px;height:56px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:50;box-shadow:var(--shadow)}
+.topbar{background:var(--surface);border-bottom:1px solid var(--border);padding:0 32px;height:56px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:50;box-shadow:0 1px 0 var(--border),0 2px 12px rgba(0,0,0,.04)}
 .topbar-title{font-family:var(--font-display);font-size:15px;font-weight:700;letter-spacing:-.3px}
 .api-status{display:flex;align-items:center;gap:8px;font-size:11px;font-family:var(--font-mono);color:var(--text-muted)}
 .status-dot{width:7px;height:7px;border-radius:50%;background:var(--text-dim)}
@@ -96,7 +96,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-body);display
   border-radius:var(--radius-lg);
   border:1px solid var(--border);
   background:var(--surface);
-  cursor:pointer;transition:all .2s;
+  cursor:pointer;transition:all .18s cubic-bezier(.4,0,.2,1);
   margin-bottom:8px;
   text-align:left;
   position:relative;overflow:hidden;
@@ -105,19 +105,20 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-body);display
   content:'';position:absolute;
   top:0;left:0;bottom:0;width:3px;
   background:var(--btn-accent,var(--blue));
-  opacity:0;transition:opacity .2s;
+  opacity:0;transition:opacity .18s;
 }
 .cmd-btn:hover{
   border-color:var(--btn-accent,var(--blue));
-  background:var(--surface2);
-  box-shadow:var(--shadow-md);
-  transform:translateX(2px);
+  background:linear-gradient(135deg,var(--surface2),var(--surface));
+  box-shadow:0 4px 16px rgba(0,0,0,.08),0 1px 4px rgba(0,0,0,.04);
+  transform:translateX(3px) translateY(-1px);
 }
 .cmd-btn:hover::before{opacity:1}
-.cmd-btn:disabled{opacity:.5;cursor:not-allowed;transform:none;box-shadow:none}
+.cmd-btn:active{transform:translateX(1px) translateY(0);box-shadow:none}
+.cmd-btn:disabled{opacity:.4;cursor:not-allowed;transform:none;box-shadow:none}
 .cmd-btn.running{
   border-color:var(--btn-accent,var(--blue));
-  background:var(--surface2);
+  background:linear-gradient(135deg,var(--surface2),var(--surface));
 }
 .cmd-btn.running::before{opacity:1}
 
@@ -190,7 +191,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-body);display
   padding:4px 10px;border-radius:6px;cursor:pointer;
   font-family:var(--font-body);transition:all .15s;
 }
-.clear-btn:hover{color:var(--red);border-color:var(--red)}
+.clear-btn:hover{color:var(--red);border-color:var(--red);background:var(--red-bg)}
 
 .results-body{
   flex:1;padding:20px 24px;
@@ -224,9 +225,11 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-body);display
   border-radius:var(--radius-lg);
   overflow:hidden;
   margin-bottom:14px;
-  box-shadow:var(--shadow);
+  box-shadow:0 2px 8px rgba(0,0,0,.06),0 1px 3px rgba(0,0,0,.04);
+  transition:box-shadow .2s;
   animation:slideIn .3s ease;
 }
+.result-block:hover{box-shadow:0 4px 16px rgba(0,0,0,.09),0 2px 6px rgba(0,0,0,.05)}
 @keyframes slideIn{
   from{opacity:0;transform:translateY(10px)}
   to{opacity:1;transform:translateY(0)}
@@ -348,7 +351,44 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-body);display
 .fade-in{animation:fadeIn .3s ease}
 @keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
 
-/* API config notice */
+/* Render wake button */
+.btn-render{--btn-accent:#6366f1;--btn-icon-bg:#ede9fe}
+.btn-render .cmd-btn-name{color:var(--text)}
+
+.render-timer{
+  display:none;
+  margin-top:8px;
+  padding:10px 14px;
+  background:linear-gradient(135deg,rgba(99,102,241,.08),rgba(139,92,246,.08));
+  border:1px solid rgba(99,102,241,.25);
+  border-radius:var(--radius);
+}
+.render-timer-label{
+  font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;
+  color:#6366f1;margin-bottom:6px;
+}
+.render-timer-bar-wrap{
+  background:rgba(99,102,241,.15);
+  border-radius:4px;height:6px;overflow:hidden;margin-bottom:6px;
+}
+.render-timer-bar{
+  height:100%;width:100%;
+  background:linear-gradient(90deg,#6366f1,#8b5cf6);
+  border-radius:4px;
+  transition:width .5s linear;
+}
+.render-timer-text{
+  font-size:11px;font-family:var(--font-mono);color:#6366f1;
+}
+.locked-overlay{display:none}
+.all-locked .cmd-btn:not(#btn-wake-render){
+  opacity:.4;pointer-events:none;
+}
+.all-locked #btn-wake-render{
+  background:linear-gradient(135deg,rgba(99,102,241,.08),rgba(139,92,246,.05));
+  border-color:#6366f1;
+}
+
 .api-notice{
   background:linear-gradient(135deg,rgba(59,130,246,.08),rgba(139,92,246,.08));
   border:1px solid rgba(59,130,246,.2);
@@ -432,7 +472,29 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-body);display
       </div>
 
       <div class="api-notice" id="api-notice">
-        <strong>API Required</strong> — Set <code>RAILWAY_API_URL</code> in your dashboard config to enable live commands. See setup instructions below.
+        <strong>API Required</strong> — Set <code>RENDER_API_URL</code> in your dashboard config to enable live commands. See setup instructions below.
+      </div>
+
+      <div class="cmd-group">
+        <div class="cmd-group-label">🚀 Deployment</div>
+
+        <button class="cmd-btn btn-render" id="btn-wake-render" onclick="wakeRender()">
+          <div class="cmd-btn-icon">🚀</div>
+          <div class="cmd-btn-info">
+            <div class="cmd-btn-name">Wake Render Server</div>
+            <div class="cmd-btn-desc">Kick-starts the Render deployment from cold sleep — wait 40s before running commands</div>
+            <div class="cmd-btn-tag">/ping</div>
+          </div>
+          <div class="cmd-btn-spinner"></div>
+        </button>
+
+        <div class="render-timer" id="render-timer">
+          <div class="render-timer-label">⏳ Server warming up — commands locked</div>
+          <div class="render-timer-bar-wrap">
+            <div class="render-timer-bar" id="render-timer-bar"></div>
+          </div>
+          <div class="render-timer-text" id="render-timer-text">40s remaining…</div>
+        </div>
       </div>
 
       <div class="cmd-group">
@@ -525,7 +587,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-body);display
       <div style="margin-top:24px;padding-top:20px;border-top:1px solid var(--border)">
         <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--text-dim);margin-bottom:10px">Setup</div>
         <div style="font-size:11px;color:var(--text-muted);line-height:1.7">
-          To enable live commands, deploy <code style="background:var(--surface2);border:1px solid var(--border);border-radius:3px;padding:1px 5px;font-family:var(--font-mono);font-size:10px;color:var(--blue)">api_server.py</code> on Railway and set the URL in <code style="background:var(--surface2);border:1px solid var(--border);border-radius:3px;padding:1px 5px;font-family:var(--font-mono);font-size:10px;color:var(--blue)">config.js</code>.
+          To enable live commands, deploy <code style="background:var(--surface2);border:1px solid var(--border);border-radius:3px;padding:1px 5px;font-family:var(--font-mono);font-size:10px;color:var(--blue)">api_server.py</code> on Render and set the URL in <code style="background:var(--surface2);border:1px solid var(--border);border-radius:3px;padding:1px 5px;font-family:var(--font-mono);font-size:10px;color:var(--blue)">config.js</code>.
           <br><br>
           Without the API, this panel reads from cached JSON data and shows the last known results.
         </div>
@@ -564,7 +626,7 @@ async function wakeUpApi() {
 }
 wakeUpApi();
 // ── Config ────────────────────────────────────────────────────────
-// Set your Railway API URL here after deploying api_server.py
+// Set your Render API URL here after deploying api_server.py
 const API_URL = 'https://rank-tracker-api-aa7k.onrender.com';
 const USE_CACHE = !API_URL;
 
@@ -652,7 +714,87 @@ function clearResults() {
   document.getElementById('results-meta').textContent  = 'No command run yet';
 }
 
-// ── Main command router ───────────────────────────────────────────
+// ── Wake Render deployment ────────────────────────────────────────
+function wakeRender() {
+  const btn   = document.getElementById('btn-wake-render');
+  const timer = document.getElementById('render-timer');
+  const bar   = document.getElementById('render-timer-bar');
+  const txt   = document.getElementById('render-timer-text');
+  const panel = document.querySelector('.cmd-panel');
+
+  if (btn.disabled) return;
+
+  // Lock everything
+  btn.disabled = true;
+  btn.classList.add('running');
+  panel.classList.add('all-locked');
+  timer.style.display = 'block';
+
+  // Show result panel feedback
+  document.getElementById('results-title').textContent = '🚀 Waking Render Server';
+  document.getElementById('results-meta').textContent  = `Started at ${now()}`;
+  document.getElementById('results-body').innerHTML = `
+    <div class="result-block fade-in">
+      <div class="result-block-header">
+        <span class="result-block-icon">🚀</span>
+        <span class="result-block-title">Render Server — Warming Up</span>
+        <span class="result-block-time">${now()}</span>
+      </div>
+      <div class="result-block-body">
+        <div class="log-stream" id="wake-log">
+          <span class="log-line info">▶ Sending wake request to Render…</span>
+          <span class="log-cursor"></span>
+        </div>
+        <div class="progress-wrap" style="margin-top:10px"><div class="progress-bar" id="wake-main-bar" style="width:5%"></div></div>
+      </div>
+    </div>`;
+
+  // Fire the actual ping
+  if (API_URL) {
+    fetch(API_URL + '/', { signal: AbortSignal.timeout(45000) })
+      .then(() => addWakeLog('✅ Server responded — ready!', 'success'))
+      .catch(() => addWakeLog('⚠ No response yet — may still be booting', 'warning'));
+  }
+
+  const total = 40;
+  let elapsed = 0;
+  const interval = setInterval(() => {
+    elapsed++;
+    const pct      = (elapsed / total) * 100;
+    const remaining = total - elapsed;
+
+    bar.style.width = pct + '%';
+    txt.textContent  = remaining > 0 ? `${remaining}s remaining…` : 'Done — commands unlocked!';
+
+    // Update main bar too
+    const mainBar = document.getElementById('wake-main-bar');
+    if (mainBar) mainBar.style.width = pct + '%';
+
+    if (elapsed >= total) {
+      clearInterval(interval);
+      btn.disabled = false;
+      btn.classList.remove('running');
+      panel.classList.remove('all-locked');
+      addWakeLog('✅ 40s elapsed — all commands are now unlocked.', 'success');
+      document.getElementById('results-meta').textContent = `Completed at ${now()}`;
+      setTimeout(() => { timer.style.display = 'none'; }, 3000);
+    }
+  }, 1000);
+}
+
+function addWakeLog(msg, type='') {
+  const log = document.getElementById('wake-log');
+  if (!log) return;
+  const cursor = log.querySelector('.log-cursor');
+  const line   = document.createElement('span');
+  line.className   = `log-line ${type}`;
+  line.textContent = msg;
+  if (cursor) log.insertBefore(line, cursor);
+  else log.appendChild(line);
+  log.scrollTop = log.scrollHeight;
+}
+
+
 function cmdToEndpoint(cmd) {
   const map = {
     'full-scan':  'scan',
@@ -828,7 +970,7 @@ async function runFromCache(cmd) {
     case 'drops':      await cacheDrops(); break;
     case 'targets':    await cacheTargets(); break;
     case 'aioverview': await cacheAi(); break;
-    case 'full-scan':  showCacheNotice('Full Scan requires live API. Deploy api_server.py on Railway to enable.'); break;
+    case 'full-scan':  showCacheNotice('Full Scan requires live API. Deploy api_server.py on Render to enable.'); break;
     default:           showCacheNotice('Command requires live API.');
   }
 }
@@ -1091,7 +1233,7 @@ function showCacheNotice(msg) {
       <div class="result-block-body">
         <div class="log-stream">
           <span class="log-line warning">⚠ ${msg}</span>
-          <span class="log-line info">▶ Deploy api_server.py on Railway to enable live commands</span>
+          <span class="log-line info">▶ Deploy api_server.py on Render to enable live commands</span>
         </div>
       </div>
     </div>`;
