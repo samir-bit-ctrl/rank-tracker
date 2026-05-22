@@ -11,7 +11,7 @@ import re
 import time
 import random
 from datetime import datetime
-from urllib.parse import urlparse, unquote
+from urllib.parse import urlparse, unquote, quote_plus
 
 import gspread
 from google.oauth2 import service_account
@@ -27,32 +27,27 @@ SCOPES = [
 SHEET_NAME = "🔍 AIO Citations"
 
 # ── Selector targets for Google AI Overview citation modules ──────────
-# Google rotates class names — we target multiple known patterns
 AIO_SELECTORS = [
-    "div.Kevs9",           # primary citation container (2024–2025)
+    "div.Kevs9",           # primary citation container
     "div.VqeGe",           # secondary citation block
     "div.wDYxhc",          # AI overview wrapper
     "div.X5LH0c",          # citation list container
     "div[data-attrid='wa:/description']",  # structured answer
     "div.LLtSOc",          # sources panel
     "div.ayRjaf",          # cited links block
-    "cite",                # fallback: any cited URL element
+    "cite",                # fallback
 ]
 
 # Desktop user agents — rotate to reduce fingerprinting
 USER_AGENTS = [
-    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
-    "(KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36",
-    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
-    "(KHTML, like Gecko) Chrome/123.0.0.0 Safari/537.36",
-    "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 "
-    "(KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36",
+    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36",
+    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/123.0.0.0 Safari/537.36",
+    "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36",
 ]
 
-# Domains to filter out from citations
 BLOCKED_DOMAINS = [
     "google.com", "google.co.in", "googleapis.com",
-    "gstatic.com", "youtube.com", "maps.google.com",
+    "gstatic.com", "youtube.com", "googleusercontent.com",
     "accounts.google.com", "support.google.com",
 ]
 
@@ -60,8 +55,9 @@ CACHE_FILE = "data/aio_cache.json"
 
 
 # ══════════════════════════════════════════════════════════════════════
-#  CACHE
+#  CACHE OPERATORS
 # ══════════════════════════════════════════════════════════════════════
+
 def _load_cache() -> dict:
     if not os.path.exists(CACHE_FILE):
         return {}
@@ -85,7 +81,6 @@ def _cache_key(keyword: str) -> str:
 
 
 def _is_cache_fresh(entry: dict, max_hours: int = 24) -> bool:
-    """Return True if cache entry is less than max_hours old."""
     ts = entry.get("timestamp", "")
     if not ts:
         return False
@@ -100,28 +95,24 @@ def _is_cache_fresh(entry: dict, max_hours: int = 24) -> bool:
 # ══════════════════════════════════════════════════════════════════════
 #  URL CLEANER
 # ══════════════════════════════════════════════════════════════════════
+
 def _clean_url(raw: str) -> str | None:
-    """Extract and clean a URL from raw href or text."""
     if not raw:
         return None
 
-    # Handle Google redirect URLs
     if "/url?q=" in raw:
         match = re.search(r"/url\?q=([^&]+)", raw)
         if match:
             raw = unquote(match.group(1))
 
-    # Strip trailing junk
     raw = raw.strip().rstrip("/")
 
-    # Validate it looks like a URL
     try:
         parsed = urlparse(raw)
         if parsed.scheme not in ("http", "https"):
             return None
         if not parsed.netloc:
             return None
-        # Filter blocked domains
         domain = parsed.netloc.lower().replace("www.", "")
         if any(bd in domain for bd in BLOCKED_DOMAINS):
             return None
@@ -131,7 +122,6 @@ def _clean_url(raw: str) -> str | None:
 
 
 def _is_our_site(url: str) -> bool:
-    """Check if URL belongs to studyriserr.com."""
     site = SITE_URL.replace("sc-domain:", "").replace("https://", "").replace("http://", "").strip("/")
     return site.lower() in url.lower()
 
@@ -139,24 +129,19 @@ def _is_our_site(url: str) -> bool:
 # ══════════════════════════════════════════════════════════════════════
 #  SINGLE KEYWORD SCRAPER
 # ══════════════════════════════════════════════════════════════════════
+
 async def scrape_aio_for_keyword(page, keyword: str) -> dict:
-    """
-    Scrape AI Overview citations for a single keyword.
-    Returns structured result dict.
-    """
-    url = f"https://www.google.com/search?q={keyword.replace(' ', '+')}&hl=en&gl=in"
+    encoded_query = quote_plus(keyword)
+    url = f"https://www.google.com/search?q={encoded_query}&hl=en&gl=in"
 
     try:
-        await page.goto(url, wait_until="domcontentloaded", timeout=30000)
-
-        # Wait for page to fully render AI overview (async JS components)
+        await page.goto(url, wait_until="load", timeout=30000)
         await page.wait_for_timeout(random.randint(4000, 6000))
 
-        # Scroll slightly to trigger lazy-loaded components
+        # Light scroll execution to trigger responsive asset layouts
         await page.evaluate("window.scrollBy(0, 300)")
         await page.wait_for_timeout(1500)
 
-        # ── Check if AI Overview exists ───────────────────────────────
         has_aio    = False
         cited_urls = []
         we_are_cited = False
@@ -167,8 +152,6 @@ async def scrape_aio_for_keyword(page, keyword: str) -> dict:
                 elements = await page.query_selector_all(selector)
                 if elements:
                     has_aio = True
-
-                    # Extract all href links from within these elements
                     for el in elements:
                         links = await el.query_selector_all("a[href]")
                         for link in links:
@@ -185,7 +168,7 @@ async def scrape_aio_for_keyword(page, keyword: str) -> dict:
             except Exception:
                 continue
 
-        # ── Get our organic position ──────────────────────────────────
+        # Organic parsing
         organic_pos  = None
         organic_url  = ""
         our_site     = SITE_URL.replace("sc-domain:", "").replace("https://", "").strip("/")
@@ -206,7 +189,7 @@ async def scrape_aio_for_keyword(page, keyword: str) -> dict:
         except Exception:
             pass
 
-        # ── Extract PAA questions ─────────────────────────────────────
+        # PAA Block parsing
         paa = []
         try:
             paa_els = await page.query_selector_all("div.related-question-pair span")
@@ -250,14 +233,12 @@ async def scrape_aio_for_keyword(page, keyword: str) -> dict:
 # ══════════════════════════════════════════════════════════════════════
 #  BATCH SCRAPER
 # ══════════════════════════════════════════════════════════════════════
-async def _run_batch(keywords: list, use_cache: bool = True,
-                     delay_range: tuple = (4, 8)) -> list:
-    """Run scraping for a list of keywords using a single browser session."""
+
+async def _run_batch(keywords: list, use_cache: bool = True, delay_range: tuple = (4, 8)) -> list:
     cache    = _load_cache() if use_cache else {}
     results  = []
     to_scrape = []
 
-    # Split into cached vs needs scraping
     for kw in keywords:
         key   = _cache_key(kw)
         entry = cache.get(key)
@@ -271,8 +252,7 @@ async def _run_batch(keywords: list, use_cache: bool = True,
         print(f"  ✅ All {len(results)} keywords served from cache")
         return results
 
-    print(f"  🌐 Scraping {len(to_scrape)} keywords "
-          f"({len(results)} from cache)...")
+    print(f"  🌐 Scraping {len(to_scrape)} keywords ({len(results)} from cache)...")
 
     async with async_playwright() as pw:
         browser = await pw.chromium.launch(
@@ -298,7 +278,7 @@ async def _run_batch(keywords: list, use_cache: bool = True,
             }
         )
 
-        # Remove automation markers
+        # FIX: Inject the anti-bot evasion parameters BEFORE creating the new page object
         await context.add_init_script("""
             Object.defineProperty(navigator, 'webdriver', {get: () => undefined});
             Object.defineProperty(navigator, 'plugins', {get: () => [1, 2, 3]});
@@ -322,11 +302,9 @@ async def _run_batch(keywords: list, use_cache: bool = True,
 
             results.append(result)
 
-            # Cache the result
             cache[_cache_key(kw)] = result
             _save_cache(cache)
 
-            # Human-like delay between searches
             if i < len(to_scrape) - 1:
                 delay = random.uniform(*delay_range)
                 await asyncio.sleep(delay)
@@ -339,24 +317,16 @@ async def _run_batch(keywords: list, use_cache: bool = True,
 # ══════════════════════════════════════════════════════════════════════
 #  KEYWORD SELECTOR
 # ══════════════════════════════════════════════════════════════════════
+
 def get_priority_keywords(max_keywords: int = 50) -> list:
-    """
-    Select high-priority informational keywords to check for AI Overview.
-    Priority order:
-    1. TRACKED_KEYWORDS from settings (manual list)
-    2. Top keywords by impressions from history.json
-    3. Target keywords from 🎯 Target Keywords sheet
-    """
     from config.settings import TRACKED_KEYWORDS
 
     keywords = []
 
-    # 1. Manual tracked keywords
     if TRACKED_KEYWORDS:
         keywords.extend([k.lower().strip() for k in TRACKED_KEYWORDS])
         print(f"  📋 {len(TRACKED_KEYWORDS)} keywords from TRACKED_KEYWORDS")
 
-    # 2. Top impressions from history (informational queries)
     try:
         with open("data/history.json") as f:
             history = json.load(f)
@@ -364,7 +334,6 @@ def get_priority_keywords(max_keywords: int = 50) -> list:
         dates   = sorted(history.keys())
         latest  = history[dates[-1]]
 
-        # Filter to informational keywords (contain question words or exam terms)
         INFO_SIGNALS = [
             "how", "what", "when", "where", "which", "who", "why",
             "syllabus", "eligibility", "result", "admit card", "date",
@@ -376,7 +345,6 @@ def get_priority_keywords(max_keywords: int = 50) -> list:
             kw_lower = kw.lower()
             return any(sig in kw_lower for sig in INFO_SIGNALS)
 
-        # Sort by impressions descending
         sorted_kws = sorted(
             latest.items(),
             key=lambda x: x[1].get("impressions", 0),
@@ -396,7 +364,6 @@ def get_priority_keywords(max_keywords: int = 50) -> list:
     except Exception as e:
         print(f"  ⚠️  Could not load history keywords: {e}")
 
-    # Deduplicate + cap
     seen = set()
     final = []
     for kw in keywords:
@@ -413,9 +380,8 @@ def get_priority_keywords(max_keywords: int = 50) -> list:
 # ══════════════════════════════════════════════════════════════════════
 #  GOOGLE SHEETS WRITER
 # ══════════════════════════════════════════════════════════════════════
-def write_aio_sheet(results: list):
-    """Write AIO extraction results to dedicated Google Sheet tab."""
 
+def write_aio_sheet(results: list):
     HEADER_DARK  = {"red": 0.192, "green": 0.212, "blue": 0.251}
     HEADER_MID   = {"red": 0.271, "green": 0.298, "blue": 0.349}
     ACCENT_GREEN = {"red": 0.196, "green": 0.533, "blue": 0.384}
@@ -438,14 +404,11 @@ def write_aio_sheet(results: list):
             ws = spreadsheet.worksheet(SHEET_NAME)
             ws.clear()
         except gspread.WorksheetNotFound:
-            ws = spreadsheet.add_worksheet(
-                title=SHEET_NAME, rows=500, cols=14
-            )
+            ws = spreadsheet.add_worksheet(title=SHEET_NAME, rows=500, cols=14)
 
         sid   = ws.id
         today = datetime.now().strftime("%Y-%m-%d %H:%M")
 
-        # ── Summary stats ─────────────────────────────────────────────
         total       = len(results)
         has_aio     = [r for r in results if r.get("has_aio")]
         we_cited    = [r for r in results if r.get("we_are_cited")]
@@ -453,56 +416,23 @@ def write_aio_sheet(results: list):
         errors      = [r for r in results  if r.get("error")]
 
         rows = [
-            # Title
-            [f"🔍 AIO CITATIONS — LOCAL SCRAPER — {today}",
-             "", "", "", "", "", "", "", "", "", "", "", "", ""],
-            # Summary labels
-            ["Total Checked", "Has AI Overview", "We're Cited",
-             "Not Cited", "No AIO", "Errors", "", "", "", "", "", "", "", ""],
-            # Summary values
-            [total, len(has_aio), len(we_cited),
-             len(not_cited), total - len(has_aio), len(errors),
-             "", "", "", "", "", "", "", ""],
-            # Spacer
+            [f"🔍 AIO CITATIONS — LOCAL SCRAPER — {today}", "", "", "", "", "", "", "", "", "", "", "", "", ""],
+            ["Total Checked", "Has AI Overview", "We're Cited", "Not Cited", "No AIO", "Errors", "", "", "", "", "", "", "", ""],
+            [total, len(has_aio), len(we_cited), len(not_cited), total - len(has_aio), len(errors), "", "", "", "", "", "", "", ""],
             [""] * 14,
-            # Column headers
-            [
-                "Keyword",
-                "Has AIO",
-                "We're Cited",
-                "Cite Snippet",
-                "# Sources",
-                "Source URLs",
-                "Organic Pos",
-                "Our URL",
-                "PAA Questions",
-                "Opportunity",
-                "Method",
-                "Last Checked",
-                "", ""
-            ],
+            ["Keyword", "Has AIO", "We're Cited", "Cite Snippet", "# Sources", "Source URLs", "Organic Pos", "Our URL", "PAA Questions", "Opportunity", "Method", "Last Checked", "", ""]
         ]
 
         header_row = len(rows) - 1
 
         for r in results:
             if r.get("error"):
-                rows.append([
-                    r.get("keyword", ""),
-                    "⚠️ Error", "", r["error"],
-                    "", "", "", "", "", "", "Playwright", r.get("timestamp", "")[:16],
-                    "", ""
-                ])
+                rows.append([r.get("keyword", ""), "⚠️ Error", "", r["error"], "", "", "", "", "", "", "Playwright", r.get("timestamp", "")[:16], "", ""])
                 continue
 
             has_str   = "✅ Yes" if r.get("has_aio") else "❌ No"
-            cited_str = (
-                "🎯 Yes — We're Cited!" if r.get("we_are_cited")
-                else "❌ Not cited"      if r.get("has_aio")
-                else "—"
-            )
+            cited_str = "🎯 Yes — We're Cited!" if r.get("we_are_cited") else "❌ Not cited" if r.get("has_aio") else "—"
 
-            # Opportunity
             org_pos = r.get("organic_pos")
             if r.get("we_are_cited"):
                 opp = "🏆 Maintain — keep content fresh"
@@ -517,171 +447,48 @@ def write_aio_sheet(results: list):
             else:
                 opp = "📈 Improve content depth"
 
-            # URLs — join first 3 for sheet readability
             urls      = r.get("cited_urls", [])
             urls_str  = "\n".join(urls[:3])
             paa_str   = " | ".join(r.get("paa", [])[:3])
             timestamp = r.get("timestamp", "")[:16]
 
             rows.append([
-                r.get("keyword", ""),
-                has_str,
-                cited_str,
-                r.get("cite_snippet", "—"),
-                r.get("cited_count", 0),
-                urls_str,
-                r.get("organic_pos", "Not ranking"),
-                r.get("organic_url", "—"),
-                paa_str,
-                opp,
-                "Playwright (Free)",
-                timestamp,
-                "", ""
+                r.get("keyword", ""), has_str, cited_str, r.get("cite_snippet", "—"),
+                r.get("cited_count", 0), urls_str, r.get("organic_pos", "Not ranking"),
+                r.get("organic_url", "—"), paa_str, opp, "Playwright (Free)", timestamp, "", ""
             ])
 
         ws.update("A1", rows)
 
-        # ── Formatting ────────────────────────────────────────────────
-        requests = [
-            # Whole sheet background
-            {"repeatCell": {
-                "range": {"sheetId": sid},
-                "cell": {"userEnteredFormat": {
-                    "backgroundColor": OFF_WHITE,
-                    "textFormat": {"fontSize": 10, "foregroundColor": DARK_TEXT}
-                }},
-                "fields": "userEnteredFormat"
-            }},
-            # Title
-            {"repeatCell": {
-                "range": {"sheetId": sid, "startRowIndex": 0, "endRowIndex": 1},
-                "cell": {"userEnteredFormat": {
-                    "backgroundColor": HEADER_DARK,
-                    "textFormat": {"foregroundColor": WHITE, "bold": True, "fontSize": 12}
-                }},
-                "fields": "userEnteredFormat"
-            }},
-            # Summary labels
-            {"repeatCell": {
-                "range": {"sheetId": sid, "startRowIndex": 1, "endRowIndex": 2},
-                "cell": {"userEnteredFormat": {
-                    "backgroundColor": HEADER_MID,
-                    "textFormat": {"foregroundColor": WHITE, "bold": True, "fontSize": 9}
-                }},
-                "fields": "userEnteredFormat"
-            }},
-            # Summary values
-            {"repeatCell": {
-                "range": {"sheetId": sid, "startRowIndex": 2, "endRowIndex": 3},
-                "cell": {"userEnteredFormat": {
-                    "backgroundColor": WHITE,
-                    "textFormat": {"fontSize": 14, "bold": True, "foregroundColor": DARK_TEXT}
-                }},
-                "fields": "userEnteredFormat"
-            }},
-            # Column headers
-            {"repeatCell": {
-                "range": {"sheetId": sid,
-                          "startRowIndex": header_row,
-                          "endRowIndex":   header_row + 1},
-                "cell": {"userEnteredFormat": {
-                    "backgroundColor": HEADER_DARK,
-                    "textFormat": {"foregroundColor": WHITE, "bold": True, "fontSize": 9}
-                }},
-                "fields": "userEnteredFormat"
-            }},
-            # Alternating rows
-            {"addConditionalFormatRule": {
-                "rule": {
-                    "ranges": [{"sheetId": sid, "startRowIndex": header_row + 1}],
-                    "booleanRule": {
-                        "condition": {
-                            "type": "CUSTOM_FORMULA",
-                            "values": [{"userEnteredValue": "=ISEVEN(ROW())"}]
-                        },
-                        "format": {"backgroundColor": LIGHT_GREY}
-                    }
-                },
-                "index": 0
-            }},
-            # Freeze + hide gridlines
-            {"updateSheetProperties": {
-                "properties": {
-                    "sheetId": sid,
-                    "gridProperties": {
-                        "frozenRowCount":    header_row + 1,
-                        "frozenColumnCount": 1,
-                        "hideGridlines":     True
-                    }
-                },
-                "fields": "gridProperties.frozenRowCount,"
-                           "gridProperties.frozenColumnCount,"
-                           "gridProperties.hideGridlines"
-            }},
-            # Column widths
-            {"updateDimensionProperties": {
-                "range": {"sheetId": sid, "dimension": "COLUMNS",
-                          "startIndex": 0, "endIndex": 1},
-                "properties": {"pixelSize": 240}, "fields": "pixelSize"
-            }},
-            {"updateDimensionProperties": {
-                "range": {"sheetId": sid, "dimension": "COLUMNS",
-                          "startIndex": 1, "endIndex": 3},
-                "properties": {"pixelSize": 120}, "fields": "pixelSize"
-            }},
-            {"updateDimensionProperties": {
-                "range": {"sheetId": sid, "dimension": "COLUMNS",
-                          "startIndex": 3, "endIndex": 4},
-                "properties": {"pixelSize": 200}, "fields": "pixelSize"
-            }},
-            {"updateDimensionProperties": {
-                "range": {"sheetId": sid, "dimension": "COLUMNS",
-                          "startIndex": 5, "endIndex": 6},
-                "properties": {"pixelSize": 280}, "fields": "pixelSize"
-            }},
-            {"updateDimensionProperties": {
-                "range": {"sheetId": sid, "dimension": "COLUMNS",
-                          "startIndex": 7, "endIndex": 8},
-                "properties": {"pixelSize": 280}, "fields": "pixelSize"
-            }},
-            {"updateDimensionProperties": {
-                "range": {"sheetId": sid, "dimension": "COLUMNS",
-                          "startIndex": 8, "endIndex": 9},
-                "properties": {"pixelSize": 260}, "fields": "pixelSize"
-            }},
-            {"updateDimensionProperties": {
-                "range": {"sheetId": sid, "dimension": "COLUMNS",
-                          "startIndex": 9, "endIndex": 10},
-                "properties": {"pixelSize": 220}, "fields": "pixelSize"
-            }},
+        # Format layout engine
+        formatting_requests = [
+            {"repeatCell": {"range": {"sheetId": sid}, "cell": {"userEnteredFormat": {"backgroundColor": OFF_WHITE, "textFormat": {"fontSize": 10, "foregroundColor": DARK_TEXT}}}, "fields": "userEnteredFormat"}},
+            {"repeatCell": {"range": {"sheetId": sid, "startRowIndex": 0, "endRowIndex": 1}, "cell": {"userEnteredFormat": {"backgroundColor": HEADER_DARK, "textFormat": {"foregroundColor": WHITE, "bold": True, "fontSize": 12}}}, "fields": "userEnteredFormat"}},
+            {"repeatCell": {"range": {"sheetId": sid, "startRowIndex": 1, "endRowIndex": 2}, "cell": {"userEnteredFormat": {"backgroundColor": HEADER_MID, "textFormat": {"foregroundColor": WHITE, "bold": True, "fontSize": 9}}}, "fields": "userEnteredFormat"}},
+            {"repeatCell": {"range": {"sheetId": sid, "startRowIndex": 2, "endRowIndex": 3}, "cell": {"userEnteredFormat": {"backgroundColor": WHITE, "textFormat": {"fontSize": 14, "bold": True, "foregroundColor": DARK_TEXT}}}, "fields": "userEnteredFormat"}},
+            {"repeatCell": {"range": {"sheetId": sid, "startRowIndex": header_row, "endRowIndex": header_row + 1}, "cell": {"userEnteredFormat": {"backgroundColor": HEADER_DARK, "textFormat": {"foregroundColor": WHITE, "bold": True, "fontSize": 9}}}, "fields": "userEnteredFormat"}},
+            {"addConditionalFormatRule": {"rule": {"ranges": [{"sheetId": sid, "startRowIndex": header_row + 1}], "booleanRule": {"condition": {"type": "CUSTOM_FORMULA", "values": [{"userEnteredValue": "=ISEVEN(ROW())"}]}, "format": {"backgroundColor": LIGHT_GREY}}}, "index": 0}},
+            {"updateSheetProperties": {"properties": {"sheetId": sid, "gridProperties": {"frozenRowCount": header_row + 1, "frozenColumnCount": 1, "hideGridlines": True}}, "fields": "gridProperties.frozenRowCount,gridProperties.frozenColumnCount,gridProperties.hideGridlines"}},
+            {"updateDimensionProperties": {"range": {"sheetId": sid, "dimension": "COLUMNS", "startIndex": 0, "endIndex": 1}, "properties": {"pixelSize": 240}, "fields": "pixelSize"}},
+            {"updateDimensionProperties": {"range": {"sheetId": sid, "dimension": "COLUMNS", "startIndex": 1, "endIndex": 3}, "properties": {"pixelSize": 120}, "fields": "pixelSize"}},
+            {"updateDimensionProperties": {"range": {"sheetId": sid, "dimension": "COLUMNS", "startIndex": 3, "endIndex": 4}, "properties": {"pixelSize": 200}, "fields": "pixelSize"}},
+            {"updateDimensionProperties": {"range": {"sheetId": sid, "dimension": "COLUMNS", "startIndex": 5, "endIndex": 6}, "properties": {"pixelSize": 280}, "fields": "pixelSize"}},
+            {"updateDimensionProperties": {"range": {"sheetId": sid, "dimension": "COLUMNS", "startIndex": 7, "endIndex": 8}, "properties": {"pixelSize": 280}, "fields": "pixelSize"}},
+            {"updateDimensionProperties": {"range": {"sheetId": sid, "dimension": "COLUMNS", "startIndex": 8, "endIndex": 9}, "properties": {"pixelSize": 260}, "fields": "pixelSize"}},
+            {"updateDimensionProperties": {"range": {"sheetId": sid, "dimension": "COLUMNS", "startIndex": 9, "endIndex": 10}, "properties": {"pixelSize": 220}, "fields": "pixelSize"}}
         ]
 
-        # Color-code cited column per row
         data_start = header_row + 1
         for i, r in enumerate(results):
             row_idx = data_start + i
-            if r.get("we_are_cited"):
-                color = ACCENT_GREEN
-            elif r.get("has_aio") and not r.get("we_are_cited"):
-                color = ACCENT_AMBER
-            elif not r.get("has_aio"):
-                color = SUBTLE_TEXT
-            else:
-                color = ACCENT_RED
-
-            requests.append({"repeatCell": {
-                "range": {"sheetId": sid,
-                          "startRowIndex":    row_idx,
-                          "endRowIndex":      row_idx + 1,
-                          "startColumnIndex": 2,
-                          "endColumnIndex":   3},
-                "cell": {"userEnteredFormat": {
-                    "textFormat": {"foregroundColor": color, "bold": True}
-                }},
+            color = ACCENT_GREEN if r.get("we_are_cited") else (ACCENT_AMBER if r.get("has_aio") else SUBTLE_TEXT)
+            formatting_requests.append({"repeatCell": {
+                "range": {"sheetId": sid, "startRowIndex": row_idx, "endRowIndex": row_idx + 1, "startColumnIndex": 2, "endColumnIndex": 3},
+                "cell": {"userEnteredFormat": { "textFormat": {"foregroundColor": color, "bold": True}}},
                 "fields": "userEnteredFormat.textFormat"
             }})
 
-        spreadsheet.batch_update({"requests": requests})
+        spreadsheet.batch_update({"requests": formatting_requests})
         print(f"✅ AIO Citations sheet written — {len(results)} keywords")
         return True
 
@@ -691,12 +498,11 @@ def write_aio_sheet(results: list):
 
 
 # ══════════════════════════════════════════════════════════════════════
-#  EXPORT TO JSON (for web dashboard)
+#  EXPORT TO JSON
 # ══════════════════════════════════════════════════════════════════════
-def export_aio_json(results: list):
-    """Export AIO results to dashboard/data/aio_local.json"""
-    os.makedirs("dashboard/data", exist_ok=True)
 
+def export_aio_json(results: list):
+    os.makedirs("dashboard/data", exist_ok=True)
     total     = len(results)
     has_aio   = [r for r in results if r.get("has_aio")]
     we_cited  = [r for r in results if r.get("we_are_cited")]
@@ -732,13 +538,13 @@ def export_aio_json(results: list):
     path = "dashboard/data/aio_local.json"
     with open(path, "w") as f:
         json.dump(data, f, indent=2)
-
     print(f"✅ AIO JSON exported → {path}")
 
 
 # ══════════════════════════════════════════════════════════════════════
 #  MAIN ENTRY POINT
 # ══════════════════════════════════════════════════════════════════════
+
 def run_aio_extractor(
     keywords:    list  = None,
     max_keywords: int  = 50,
@@ -746,19 +552,8 @@ def run_aio_extractor(
     write_sheet: bool  = True,
     write_json:  bool  = True,
 ) -> dict | None:
-    """
-    Main entry point. Call from main.py or api.py.
-
-    Args:
-        keywords:     Override keyword list. If None, auto-selects from history.
-        max_keywords: Max keywords to check (default 50).
-        use_cache:    Use 24h cache to avoid re-scraping.
-        write_sheet:  Write results to Google Sheets.
-        write_json:   Export results to dashboard JSON.
-    """
     print("\n🔍 Running AIO Extractor (Free Playwright Scraper)...")
 
-    # Select keywords
     if keywords is None:
         keywords = get_priority_keywords(max_keywords)
 
@@ -766,11 +561,9 @@ def run_aio_extractor(
         print("⚠️  No keywords to check")
         return None
 
-    # Run async scraper
     try:
         results = asyncio.run(_run_batch(keywords, use_cache=use_cache))
     except RuntimeError:
-        # Already in async context (e.g. FastAPI)
         loop = asyncio.get_event_loop()
         results = loop.run_until_complete(_run_batch(keywords, use_cache=use_cache))
 
@@ -778,13 +571,11 @@ def run_aio_extractor(
         print("⚠️  No results returned")
         return None
 
-    # Write outputs
     if write_sheet:
         write_aio_sheet(results)
     if write_json:
         export_aio_json(results)
 
-    # Summary
     has_aio  = len([r for r in results if r.get("has_aio")])
     cited    = len([r for r in results if r.get("we_are_cited")])
     print(f"\n📊 AIO Extraction Summary:")
@@ -802,3 +593,7 @@ def run_aio_extractor(
             "not_cited": has_aio - cited,
         }
     }
+
+if __name__ == "__main__":
+    # Standard standalone file testing block
+    run_aio_extractor(max_keywords=2)
