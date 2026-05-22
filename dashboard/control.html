@@ -5,440 +5,289 @@
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
 <title>Control Panel — studyriserr.com</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,300;0,14..32,400;0,14..32,500;0,14..32,600;0,14..32,700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{
-  --sb-bg:#0f1117;--sb-border:#1e2330;--sb-text:#94a3b8;
-  --sb-active:#f8fafc;--sb-hover:#1e2330;--sb-accent:#3b82f6;
-  --bg:#f4f6f9;--surface:#fff;--surface2:#f8fafc;
-  --border:#e2e8f0;--text:#0f172a;--text-muted:#64748b;--text-dim:#94a3b8;
-  --green:#10b981;--green-bg:#d1fae5;--red:#ef4444;--red-bg:#fee2e2;
-  --amber:#f59e0b;--amber-bg:#fef3c7;--blue:#3b82f6;--blue-bg:#dbeafe;
-  --purple:#8b5cf6;--purple-bg:#ede9fe;--cyan:#06b6d4;--cyan-bg:#cffafe;
-  --font-display:'Syne',sans-serif;--font-body:'DM Sans',sans-serif;
-  --font-mono:'DM Mono',monospace;
-  --sb-w:240px;--radius:10px;--radius-lg:14px;
-  --shadow:0 1px 3px rgba(0,0,0,.08),0 1px 2px rgba(0,0,0,.06);
-  --shadow-md:0 4px 12px rgba(0,0,0,.1);
+  --bg:#07090f;
+  --bg2:#0b0e17;
+  --surface:#10141f;
+  --surface2:#151a27;
+  --surface3:#1b2133;
+  --border:#1d2336;
+  --border2:#232b3e;
+  --text:#dde3f0;
+  --text-muted:#6c7a92;
+  --text-dim:#333d52;
+  --blue:#4d8ef5;
+  --blue-dim:rgba(77,142,245,.1);
+  --blue-border:rgba(77,142,245,.2);
+  --indigo:#7c7af5;
+  --indigo-dim:rgba(124,122,245,.1);
+  --green:#2dd4a4;
+  --green-dim:rgba(45,212,164,.1);
+  --green-border:rgba(45,212,164,.2);
+  --red:#f16b6b;
+  --red-dim:rgba(241,107,107,.1);
+  --red-border:rgba(241,107,107,.2);
+  --amber:#f5b942;
+  --amber-dim:rgba(245,185,66,.1);
+  --amber-border:rgba(245,185,66,.2);
+  --cyan:#1ec8e0;
+  --cyan-dim:rgba(30,200,224,.1);
+  --purple:#a47cf5;
+  --purple-dim:rgba(164,124,245,.1);
+  --purple-border:rgba(164,124,245,.2);
+  --font:"Inter",system-ui,sans-serif;
+  --mono:"JetBrains Mono",monospace;
+  --sb-w:248px;
+  --r:8px;--rl:12px;--rxl:16px;
 }
-html{font-size:14px;-webkit-font-smoothing:antialiased}
-body{background:var(--bg);color:var(--text);font-family:var(--font-body);display:flex;min-height:100vh}
-::-webkit-scrollbar{width:5px;height:5px}
-::-webkit-scrollbar-thumb{background:#cbd5e1;border-radius:3px}
+html{font-size:13px;-webkit-font-smoothing:antialiased}
+body{background:var(--bg);color:var(--text);font-family:var(--font);display:flex;min-height:100vh;line-height:1.5}
+::-webkit-scrollbar{width:4px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--border2);border-radius:4px}
 
-/* ── Sidebar ── */
-.sidebar{width:var(--sb-w);background:linear-gradient(180deg,#0d1020 0%,#0f1117 100%);border-right:1px solid var(--sb-border);display:flex;flex-direction:column;position:fixed;top:0;left:0;bottom:0;z-index:100;overflow-y:auto}
-.sb-logo{padding:24px 20px 20px;border-bottom:1px solid var(--sb-border)}
-.sb-logo-mark{width:36px;height:36px;background:linear-gradient(135deg,#3b82f6,#6366f1);border-radius:9px;display:flex;align-items:center;justify-content:center;font-family:var(--font-display);font-size:16px;font-weight:800;color:#fff;margin-bottom:10px;box-shadow:0 4px 12px rgba(59,130,246,.35)}
-.sb-site{font-family:var(--font-display);font-size:13px;font-weight:700;color:var(--sb-active)}
-.sb-tagline{font-size:10px;color:var(--sb-text);margin-top:2px;font-family:var(--font-mono)}
-.sb-nav{padding:16px 12px;flex:1}
-.sb-section{font-size:9px;font-weight:600;text-transform:uppercase;letter-spacing:1px;color:var(--sb-text);padding:0 8px;margin:16px 0 6px;opacity:.6}
-.sb-nav a{display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:8px;color:var(--sb-text);text-decoration:none;font-size:12.5px;font-weight:500;transition:all .15s;margin-bottom:2px}
-.sb-nav a:hover{background:var(--sb-hover);color:var(--sb-active)}
-.sb-nav a.active{background:rgba(59,130,246,.15);color:var(--sb-accent)}
-.sb-nav a .icon{width:16px;height:16px;opacity:.7;flex-shrink:0}
-.sb-nav a.active .icon{opacity:1}
-.sb-footer{padding:16px 20px;border-top:1px solid var(--sb-border)}
-.sb-updated{font-size:10px;color:var(--sb-text);font-family:var(--font-mono);opacity:.7}
-.sb-health{margin-top:10px;padding:10px 12px;border-radius:8px;background:rgba(59,130,246,.1);border:1px solid rgba(59,130,246,.2)}
-.sb-health-label{font-size:9px;font-weight:600;text-transform:uppercase;letter-spacing:.8px;color:var(--sb-text);opacity:.8;margin-bottom:4px}
-.sb-health-score{font-family:var(--font-display);font-size:22px;font-weight:800;color:var(--sb-accent);line-height:1}
-.sb-health-sub{font-size:10px;color:var(--sb-text);margin-top:3px}
+/* SIDEBAR */
+.sidebar{width:var(--sb-w);background:var(--bg2);border-right:1px solid var(--border);
+  display:flex;flex-direction:column;position:fixed;top:0;left:0;bottom:0;z-index:100;overflow-y:auto}
+.sb-logo{padding:20px 18px 16px;border-bottom:1px solid var(--border)}
+.sb-logo-row{display:flex;align-items:center;gap:10px}
+.sb-mark{width:32px;height:32px;flex-shrink:0;border-radius:8px;
+  background:linear-gradient(135deg,#4d8ef5,#7c7af5);
+  display:flex;align-items:center;justify-content:center;
+  font-size:12px;font-weight:700;color:#fff;letter-spacing:-.3px;
+  box-shadow:0 0 0 1px rgba(77,142,245,.35),0 4px 14px rgba(77,142,245,.18)}
+.sb-site{font-size:13px;font-weight:600;color:var(--text);letter-spacing:-.25px}
+.sb-tagline{font-size:10px;color:var(--text-dim);margin-top:1px;font-family:var(--mono)}
+.sb-nav{padding:12px 10px;flex:1}
+.sb-section{font-size:9px;font-weight:600;text-transform:uppercase;letter-spacing:1.3px;
+  color:var(--text-dim);padding:0 8px;margin:16px 0 4px}
+.sb-nav a{display:flex;align-items:center;gap:8px;padding:7px 9px;border-radius:var(--r);
+  color:var(--text-muted);text-decoration:none;font-size:12.5px;font-weight:500;
+  transition:all .13s;margin-bottom:1px;border:1px solid transparent}
+.sb-nav a:hover{background:var(--surface);color:var(--text);border-color:var(--border)}
+.sb-nav a.active{background:var(--blue-dim);color:var(--blue);border-color:var(--blue-border)}
+.sb-nav a svg{width:14px;height:14px;opacity:.55;flex-shrink:0}
+.sb-nav a.active svg,.sb-nav a:hover svg{opacity:1}
+.sb-footer{padding:13px 15px 16px;border-top:1px solid var(--border)}
+.sb-updated{font-size:10px;color:var(--text-dim);font-family:var(--mono);margin-bottom:9px}
+.sb-health{padding:10px 12px;border-radius:var(--r);background:var(--surface);border:1px solid var(--border2)}
+.sb-health-label{font-size:9px;font-weight:600;text-transform:uppercase;letter-spacing:1px;color:var(--text-dim);margin-bottom:5px}
+.sb-health-score{font-size:22px;font-weight:700;color:var(--blue);line-height:1;letter-spacing:-1px;font-family:var(--mono)}
+.sb-health-sub{font-size:10px;color:var(--text-muted);margin-top:3px}
 
-/* ── Main ── */
-.main{margin-left:var(--sb-w);flex:1;min-height:100vh}
-.topbar{background:var(--surface);border-bottom:1px solid var(--border);padding:0 32px;height:56px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:50;box-shadow:0 1px 0 var(--border),0 2px 12px rgba(0,0,0,.04)}
-.topbar-title{font-family:var(--font-display);font-size:15px;font-weight:700;letter-spacing:-.3px}
-.api-status{display:flex;align-items:center;gap:8px;font-size:11px;font-family:var(--font-mono);color:var(--text-muted)}
-.status-dot{width:7px;height:7px;border-radius:50%;background:var(--text-dim)}
-.status-dot.online{background:var(--green);animation:pulse 2s infinite}
+/* TOPBAR */
+.main{margin-left:var(--sb-w);flex:1;min-height:100vh;display:flex;flex-direction:column}
+.topbar{background:rgba(7,9,15,.88);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);
+  border-bottom:1px solid var(--border);padding:0 26px;height:50px;
+  display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:50}
+.topbar-left{display:flex;align-items:center;gap:7px}
+.topbar-title{font-size:13px;font-weight:600;color:var(--text);letter-spacing:-.25px}
+.topbar-sep{color:var(--text-dim);font-size:14px}
+.topbar-sub{font-size:11px;color:var(--text-muted)}
+.api-status{display:flex;align-items:center;gap:6px;font-size:10.5px;font-family:var(--mono);
+  color:var(--text-muted);background:var(--surface);border:1px solid var(--border);
+  padding:5px 11px;border-radius:20px}
+.status-dot{width:5px;height:5px;border-radius:50%;flex-shrink:0}
+.status-dot.online{background:var(--green);box-shadow:0 0 5px rgba(45,212,164,.45);animation:pulse 2.5s infinite}
 .status-dot.offline{background:var(--red)}
-@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
 
-.content{
-  display:grid;
-  grid-template-columns:380px 1fr;
-  gap:0;
-  height:calc(100vh - 56px);
-}
+/* LAYOUT */
+.content{display:grid;grid-template-columns:354px 1fr;flex:1;height:calc(100vh - 50px);overflow:hidden}
 
-/* ── Left: Command buttons ── */
-.cmd-panel{
-  background:var(--surface);
-  border-right:1px solid var(--border);
-  overflow-y:auto;
-  padding:24px 20px;
-}
-.cmd-panel-title{
-  font-family:var(--font-display);
-  font-size:13px;font-weight:800;
-  color:var(--text);letter-spacing:-.2px;
-  margin-bottom:4px;
-}
-.cmd-panel-sub{
-  font-size:11px;color:var(--text-muted);
-  margin-bottom:20px;line-height:1.5;
-}
+/* CMD PANEL */
+.cmd-panel{background:var(--bg2);border-right:1px solid var(--border);overflow-y:auto;padding:18px 14px}
+.cmd-panel-title{font-size:14px;font-weight:600;color:var(--text);letter-spacing:-.3px;margin-bottom:3px}
+.cmd-panel-sub{font-size:11px;color:var(--text-muted);line-height:1.65;margin-bottom:16px}
+.api-notice{background:var(--blue-dim);border:1px solid var(--blue-border);border-radius:var(--r);
+  padding:9px 12px;font-size:11px;color:var(--text-muted);margin-bottom:16px;line-height:1.65}
+.api-notice strong{color:var(--blue);font-weight:600}
+.api-notice code{background:rgba(77,142,245,.1);border:1px solid var(--blue-border);border-radius:3px;
+  padding:1px 5px;font-family:var(--mono);font-size:10px;color:var(--blue)}
 
 .cmd-group{margin-bottom:20px}
-.cmd-group-label{
-  font-size:9px;font-weight:700;
-  text-transform:uppercase;letter-spacing:1px;
-  color:var(--text-dim);margin-bottom:8px;
-  padding-left:2px;
-}
+.cmd-group-label{font-size:9px;font-weight:600;text-transform:uppercase;letter-spacing:1.3px;
+  color:var(--text-dim);margin-bottom:7px;padding-left:2px;
+  display:flex;align-items:center;gap:0}
+.cmd-group-label span{margin-right:8px}
+.cmd-group-label::after{content:'';flex:1;height:1px;background:linear-gradient(90deg,var(--border2),transparent)}
 
-.cmd-btn{
-  width:100%;display:flex;align-items:center;
-  gap:12px;padding:13px 16px;
-  border-radius:var(--radius-lg);
-  border:1px solid var(--border);
-  background:var(--surface);
-  cursor:pointer;transition:all .18s cubic-bezier(.4,0,.2,1);
-  margin-bottom:8px;
-  text-align:left;
-  position:relative;overflow:hidden;
-}
-.cmd-btn::before{
-  content:'';position:absolute;
-  top:0;left:0;bottom:0;width:3px;
-  background:var(--btn-accent,var(--blue));
-  opacity:0;transition:opacity .18s;
-}
-.cmd-btn:hover{
-  border-color:var(--btn-accent,var(--blue));
-  background:linear-gradient(135deg,var(--surface2),var(--surface));
-  box-shadow:0 4px 16px rgba(0,0,0,.08),0 1px 4px rgba(0,0,0,.04);
-  transform:translateX(3px) translateY(-1px);
-}
-.cmd-btn:hover::before{opacity:1}
-.cmd-btn:active{transform:translateX(1px) translateY(0);box-shadow:none}
-.cmd-btn:disabled{opacity:.4;cursor:not-allowed;transform:none;box-shadow:none}
-.cmd-btn.running{
-  border-color:var(--btn-accent,var(--blue));
-  background:linear-gradient(135deg,var(--surface2),var(--surface));
-}
-.cmd-btn.running::before{opacity:1}
-
-.cmd-btn-icon{
-  width:36px;height:36px;border-radius:9px;
-  display:flex;align-items:center;justify-content:center;
-  font-size:18px;flex-shrink:0;
-  background:var(--btn-icon-bg,var(--blue-bg));
-}
-.cmd-btn-info{flex:1}
-.cmd-btn-name{
-  font-family:var(--font-display);
-  font-size:13px;font-weight:700;
-  color:var(--text);letter-spacing:-.2px;
-  margin-bottom:2px;
-}
-.cmd-btn-desc{font-size:11px;color:var(--text-muted);line-height:1.4}
-.cmd-btn-tag{
-  font-size:10px;font-family:var(--font-mono);
-  color:var(--btn-accent,var(--blue));
-  opacity:.7;
-}
-.cmd-btn-spinner{
-  width:16px;height:16px;
-  border:2px solid var(--border);
-  border-top-color:var(--btn-accent,var(--blue));
-  border-radius:50%;
-  animation:spin .7s linear infinite;
-  display:none;flex-shrink:0;
-}
+/* BUTTONS */
+.cmd-btn{width:100%;display:flex;align-items:center;gap:10px;padding:11px 13px;
+  border-radius:var(--rl);border:1px solid var(--border);background:var(--surface);
+  cursor:pointer;transition:border-color .14s,background .14s,box-shadow .14s,transform .1s;
+  margin-bottom:5px;text-align:left;position:relative;overflow:hidden}
+.cmd-btn::before{content:'';position:absolute;inset:0;
+  background:linear-gradient(135deg,rgba(255,255,255,.025),rgba(255,255,255,0));pointer-events:none}
+.cmd-btn:hover{border-color:var(--btn-accent,var(--blue));background:var(--surface2);
+  box-shadow:0 0 0 1px var(--btn-accent,var(--blue)),0 6px 20px rgba(0,0,0,.3);
+  transform:translateY(-1px)}
+.cmd-btn:active{transform:none;box-shadow:0 0 0 1px var(--btn-accent,var(--blue))}
+.cmd-btn:disabled,.all-locked .cmd-btn:not(#btn-wake-render){opacity:.28;cursor:not-allowed;transform:none;box-shadow:none;pointer-events:none}
+.cmd-btn.running{border-color:var(--btn-accent,var(--blue));background:var(--surface2);
+  box-shadow:0 0 0 1px var(--btn-accent,var(--blue))}
+.cmd-btn-icon{width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;
+  font-size:15px;flex-shrink:0;background:var(--btn-icon-bg,var(--blue-dim));border:1px solid rgba(255,255,255,.04)}
+.cmd-btn-info{flex:1;min-width:0}
+.cmd-btn-name{font-size:12.5px;font-weight:600;color:var(--text);letter-spacing:-.2px;margin-bottom:1px}
+.cmd-btn-desc{font-size:10.5px;color:var(--text-muted);line-height:1.4;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cmd-btn-tag{font-size:9.5px;font-family:var(--mono);color:var(--btn-accent,var(--blue));
+  opacity:.55;margin-top:2px;display:block}
+.cmd-btn-spinner{width:13px;height:13px;border:1.5px solid var(--border2);
+  border-top-color:var(--btn-accent,var(--blue));border-radius:50%;
+  animation:spin .6s linear infinite;display:none;flex-shrink:0}
 .cmd-btn.running .cmd-btn-spinner{display:block}
 @keyframes spin{to{transform:rotate(360deg)}}
 
-/* Button color themes */
-.btn-scan{--btn-accent:var(--blue);--btn-icon-bg:var(--blue-bg)}
-.btn-status{--btn-accent:var(--purple);--btn-icon-bg:var(--purple-bg)}
-.btn-top{--btn-accent:var(--amber);--btn-icon-bg:var(--amber-bg)}
-.btn-gainers{--btn-accent:var(--green);--btn-icon-bg:var(--green-bg)}
-.btn-drops{--btn-accent:var(--red);--btn-icon-bg:var(--red-bg)}
-.btn-targets{--btn-accent:var(--cyan);--btn-icon-bg:var(--cyan-bg)}
-.btn-ai{--btn-accent:var(--purple);--btn-icon-bg:var(--purple-bg)}
+.btn-render{--btn-accent:var(--indigo);--btn-icon-bg:var(--indigo-dim)}
+.btn-scan  {--btn-accent:var(--blue);  --btn-icon-bg:var(--blue-dim)}
+.btn-status{--btn-accent:var(--purple);--btn-icon-bg:var(--purple-dim)}
+.btn-top   {--btn-accent:var(--amber); --btn-icon-bg:var(--amber-dim)}
+.btn-gainers{--btn-accent:var(--green);--btn-icon-bg:var(--green-dim)}
+.btn-drops {--btn-accent:var(--red);   --btn-icon-bg:var(--red-dim)}
+.btn-targets{--btn-accent:var(--cyan); --btn-icon-bg:var(--cyan-dim)}
+.btn-ai    {--btn-accent:var(--purple);--btn-icon-bg:var(--purple-dim)}
 
-/* ── Right: Results panel ── */
-.results-panel{
-  background:var(--bg);
-  overflow-y:auto;
-  display:flex;
-  flex-direction:column;
-}
-.results-header{
-  background:var(--surface);
-  border-bottom:1px solid var(--border);
-  padding:16px 24px;
-  display:flex;align-items:center;
-  justify-content:space-between;
-  position:sticky;top:0;z-index:10;
-}
-.results-title{
-  font-family:var(--font-display);
-  font-size:13px;font-weight:700;
-  color:var(--text);
-}
-.results-meta{
-  font-size:10px;font-family:var(--font-mono);
-  color:var(--text-muted);
-}
-.clear-btn{
-  font-size:11px;color:var(--text-muted);
-  background:none;border:1px solid var(--border);
-  padding:4px 10px;border-radius:6px;cursor:pointer;
-  font-family:var(--font-body);transition:all .15s;
-}
-.clear-btn:hover{color:var(--red);border-color:var(--red);background:var(--red-bg)}
+/* RENDER TIMER */
+.render-timer{display:none;margin-top:5px;padding:10px 12px;
+  background:var(--indigo-dim);border:1px solid var(--purple-border);border-radius:var(--r)}
+.render-timer-label{font-size:10px;font-weight:600;color:var(--purple);margin-bottom:7px}
+.render-timer-bar-wrap{background:rgba(124,122,245,.1);border-radius:3px;height:2px;overflow:hidden;margin-bottom:6px}
+.render-timer-bar{height:100%;width:100%;background:linear-gradient(90deg,var(--indigo),var(--purple));
+  border-radius:3px;transition:width .6s linear}
+.render-timer-text{font-size:10px;font-family:var(--mono);color:var(--text-muted)}
 
-.results-body{
-  flex:1;padding:20px 24px;
-}
+.setup-section{margin-top:18px;padding-top:16px;border-top:1px solid var(--border)}
+.setup-label{font-size:9px;font-weight:600;text-transform:uppercase;letter-spacing:1.2px;color:var(--text-dim);margin-bottom:8px}
+.setup-text{font-size:11px;color:var(--text-muted);line-height:1.75}
+.setup-text code{background:var(--surface3);border:1px solid var(--border2);border-radius:3px;
+  padding:1px 5px;font-family:var(--mono);font-size:10px;color:var(--blue)}
 
-/* Empty state */
-.empty-state{
-  display:flex;flex-direction:column;
-  align-items:center;justify-content:center;
-  min-height:400px;gap:12px;
-  color:var(--text-dim);text-align:center;
-}
-.empty-icon{
-  width:64px;height:64px;
-  background:var(--surface);
-  border:1px solid var(--border);
-  border-radius:16px;
-  display:flex;align-items:center;justify-content:center;
-  font-size:28px;margin-bottom:4px;
-}
-.empty-title{
-  font-family:var(--font-display);
-  font-size:14px;font-weight:700;color:var(--text-muted);
-}
-.empty-sub{font-size:12px;color:var(--text-dim);max-width:260px;line-height:1.5}
+/* RESULTS */
+.results-panel{background:var(--bg);overflow-y:auto;display:flex;flex-direction:column}
+.results-header{background:var(--bg2);border-bottom:1px solid var(--border);padding:12px 20px;
+  display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:10}
+.results-title{font-size:13px;font-weight:600;color:var(--text);letter-spacing:-.2px}
+.results-meta{font-size:10px;font-family:var(--mono);color:var(--text-dim)}
+.clear-btn{font-size:10.5px;color:var(--text-muted);background:var(--surface);border:1px solid var(--border);
+  padding:4px 10px;border-radius:6px;cursor:pointer;font-family:var(--font);font-weight:500;transition:all .13s}
+.clear-btn:hover{color:var(--red);border-color:var(--red-border);background:var(--red-dim)}
+.results-body{flex:1;padding:16px 20px}
 
-/* Result cards */
-.result-block{
-  background:var(--surface);
-  border:1px solid var(--border);
-  border-radius:var(--radius-lg);
-  overflow:hidden;
-  margin-bottom:14px;
-  box-shadow:0 2px 8px rgba(0,0,0,.06),0 1px 3px rgba(0,0,0,.04);
-  transition:box-shadow .2s;
-  animation:slideIn .3s ease;
-}
-.result-block:hover{box-shadow:0 4px 16px rgba(0,0,0,.09),0 2px 6px rgba(0,0,0,.05)}
-@keyframes slideIn{
-  from{opacity:0;transform:translateY(10px)}
-  to{opacity:1;transform:translateY(0)}
-}
-.result-block-header{
-  display:flex;align-items:center;gap:10px;
-  padding:12px 16px;
-  background:var(--surface2);
-  border-bottom:1px solid var(--border);
-}
-.result-block-icon{font-size:16px}
-.result-block-title{
-  font-family:var(--font-display);
-  font-size:12px;font-weight:700;color:var(--text);
-  flex:1;letter-spacing:-.2px;
-}
-.result-block-time{
-  font-size:10px;font-family:var(--font-mono);
-  color:var(--text-dim);
-}
-.result-block-body{padding:14px 16px}
+.empty-state{display:flex;flex-direction:column;align-items:center;justify-content:center;
+  min-height:360px;gap:10px;color:var(--text-dim);text-align:center}
+.empty-icon{width:52px;height:52px;background:var(--surface);border:1px solid var(--border);
+  border-radius:13px;display:flex;align-items:center;justify-content:center;font-size:22px;margin-bottom:4px}
+.empty-title{font-size:13px;font-weight:600;color:var(--text-muted)}
+.empty-sub{font-size:11px;color:var(--text-dim);max-width:230px;line-height:1.65}
 
-/* Result rows */
-.result-row{
-  display:flex;align-items:center;gap:10px;
-  padding:8px 10px;border-radius:8px;
-  margin-bottom:4px;transition:background .1s;
-}
+/* RESULT BLOCKS */
+.result-block{background:var(--surface);border:1px solid var(--border);border-radius:var(--rxl);
+  overflow:hidden;margin-bottom:10px;
+  box-shadow:0 2px 8px rgba(0,0,0,.4),0 1px 3px rgba(0,0,0,.3);
+  animation:slideIn .22s cubic-bezier(.4,0,.2,1)}
+@keyframes slideIn{from{opacity:0;transform:translateY(7px)}to{opacity:1;transform:translateY(0)}}
+.result-block-header{display:flex;align-items:center;gap:8px;padding:10px 14px;
+  background:var(--surface2);border-bottom:1px solid var(--border)}
+.result-block-icon{font-size:13px;line-height:1}
+.result-block-title{font-size:12px;font-weight:600;color:var(--text);flex:1;letter-spacing:-.2px}
+.result-block-time{font-size:9.5px;font-family:var(--mono);color:var(--text-dim)}
+.result-block-body{padding:12px 14px}
+
+.result-row{display:flex;align-items:center;gap:8px;padding:6px 8px;border-radius:6px;
+  margin-bottom:3px;transition:background .1s}
 .result-row:hover{background:var(--surface2)}
 .result-row:last-child{margin-bottom:0}
-.result-row-num{
-  font-size:10px;font-family:var(--font-mono);
-  color:var(--text-dim);min-width:20px;
-}
-.result-row-kw{
-  flex:1;font-size:12px;color:var(--text);font-weight:500;
-  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
-}
-.result-row-pos{
-  font-family:var(--font-mono);font-size:11px;
-}
+.result-row-num{font-size:10px;font-family:var(--mono);color:var(--text-dim);min-width:16px}
+.result-row-kw{flex:1;font-size:12px;color:var(--text);font-weight:500;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 
-/* Stat row for status */
-.stat-row{
-  display:flex;align-items:center;justify-content:space-between;
-  padding:10px 0;border-bottom:1px solid var(--border);
-}
+.stat-row{display:flex;align-items:center;justify-content:space-between;
+  padding:8px 0;border-bottom:1px solid var(--border)}
 .stat-row:last-child{border-bottom:none}
-.stat-row-label{font-size:12px;color:var(--text-muted)}
-.stat-row-value{
-  font-family:var(--font-mono);font-size:12px;
-  color:var(--text);font-weight:500;
-}
+.stat-row-label{font-size:11.5px;color:var(--text-muted)}
+.stat-row-value{font-family:var(--mono);font-size:11.5px;color:var(--text);font-weight:500}
 
-/* Badges */
-.badge{display:inline-flex;align-items:center;padding:2px 8px;border-radius:5px;font-size:11px;font-weight:500;white-space:nowrap}
-.badge.green{color:var(--green);background:var(--green-bg)}
-.badge.red{color:var(--red);background:var(--red-bg)}
-.badge.amber{color:var(--amber);background:var(--amber-bg)}
-.badge.blue{color:var(--blue);background:var(--blue-bg)}
-.badge.purple{color:var(--purple);background:var(--purple-bg)}
-.badge.cyan{color:var(--cyan);background:var(--cyan-bg)}
-.badge.grey{color:var(--text-muted);background:var(--surface2);border:1px solid var(--border)}
+.badge{display:inline-flex;align-items:center;padding:2px 7px;border-radius:4px;
+  font-size:10.5px;font-weight:500;white-space:nowrap;font-family:var(--mono);letter-spacing:.2px}
+.badge.green {color:var(--green); background:var(--green-dim); border:1px solid var(--green-border)}
+.badge.red   {color:var(--red);   background:var(--red-dim);   border:1px solid var(--red-border)}
+.badge.amber {color:var(--amber); background:var(--amber-dim); border:1px solid var(--amber-border)}
+.badge.blue  {color:var(--blue);  background:var(--blue-dim);  border:1px solid var(--blue-border)}
+.badge.purple{color:var(--purple);background:var(--purple-dim);border:1px solid var(--purple-border)}
+.badge.cyan  {color:var(--cyan);  background:var(--cyan-dim);  border:1px solid rgba(30,200,224,.2)}
+.badge.grey  {color:var(--text-muted);background:var(--surface2);border:1px solid var(--border2)}
 
-.pos-badge{display:inline-flex;align-items:center;justify-content:center;width:38px;height:22px;border-radius:5px;font-family:var(--font-mono);font-size:11px;font-weight:500}
-.pos-1{background:#fef3c7;color:#92400e}
-.pos-top3{background:#d1fae5;color:#065f46}
-.pos-top10{background:#dbeafe;color:#1e40af}
-.pos-top20{background:#fef9c3;color:#854d0e}
-.pos-low{background:#fee2e2;color:#991b1b}
+.pos-badge{display:inline-flex;align-items:center;justify-content:center;
+  width:34px;height:19px;border-radius:4px;font-family:var(--mono);font-size:10.5px;font-weight:500}
+.pos-1    {background:var(--amber-dim);   color:var(--amber); border:1px solid var(--amber-border)}
+.pos-top3 {background:var(--green-dim);   color:var(--green); border:1px solid var(--green-border)}
+.pos-top10{background:var(--blue-dim);    color:var(--blue);  border:1px solid var(--blue-border)}
+.pos-top20{background:var(--amber-dim);   color:var(--amber); border:1px solid var(--amber-border)}
+.pos-low  {background:var(--red-dim);     color:var(--red);   border:1px solid var(--red-border)}
 
-.delta{font-family:var(--font-mono);font-size:11px;font-weight:500;padding:2px 6px;border-radius:4px}
-.delta.up{color:var(--green);background:var(--green-bg)}
-.delta.down{color:var(--red);background:var(--red-bg)}
+.delta{font-family:var(--mono);font-size:10.5px;font-weight:500;padding:2px 6px;border-radius:4px}
+.delta.up  {color:var(--green);background:var(--green-dim);border:1px solid var(--green-border)}
+.delta.down{color:var(--red);  background:var(--red-dim);  border:1px solid var(--red-border)}
 
-/* Log stream */
-.log-stream{
-  background:var(--sb-bg);
-  border-radius:var(--radius);
-  padding:14px 16px;
-  font-family:var(--font-mono);
-  font-size:11px;
-  color:#94a3b8;
-  line-height:1.8;
-  max-height:300px;
-  overflow-y:auto;
-}
-.log-line{display:block;padding:1px 0}
-.log-line.success{color:#34d399}
-.log-line.error{color:#f87171}
-.log-line.warning{color:#fbbf24}
-.log-line.info{color:#60a5fa}
-.log-cursor{
-  display:inline-block;width:7px;height:13px;
-  background:#3b82f6;margin-left:2px;
-  animation:blink .8s step-end infinite;vertical-align:middle;
-}
+.log-stream{background:var(--bg);border:1px solid var(--border);border-radius:var(--r);
+  padding:11px 13px;font-family:var(--mono);font-size:11px;color:var(--text-muted);
+  line-height:1.9;max-height:270px;overflow-y:auto}
+.log-line{display:block}
+.log-line.success{color:var(--green)}
+.log-line.error  {color:var(--red)}
+.log-line.warning{color:var(--amber)}
+.log-line.info   {color:var(--blue)}
+.log-cursor{display:inline-block;width:5px;height:11px;background:var(--blue);
+  margin-left:2px;animation:blink .9s step-end infinite;vertical-align:middle;border-radius:1px}
 @keyframes blink{0%,100%{opacity:1}50%{opacity:0}}
 
-/* Progress bar */
-.progress-wrap{
-  background:var(--border);
-  border-radius:4px;height:4px;
-  overflow:hidden;margin-top:10px;
-}
-.progress-bar{
-  height:100%;
-  background:linear-gradient(90deg,var(--blue),var(--purple));
-  border-radius:4px;
-  transition:width .3s;
-  animation:shimmer 1.5s infinite;
-  background-size:200% 100%;
-}
-@keyframes shimmer{
-  0%{background-position:200% 0}
-  100%{background-position:-200% 0}
-}
-
-.fade-in{animation:fadeIn .3s ease}
-@keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
-
-/* Render wake button */
-.btn-render{--btn-accent:#6366f1;--btn-icon-bg:#ede9fe}
-.btn-render .cmd-btn-name{color:var(--text)}
-
-.render-timer{
-  display:none;
-  margin-top:8px;
-  padding:10px 14px;
-  background:linear-gradient(135deg,rgba(99,102,241,.08),rgba(139,92,246,.08));
-  border:1px solid rgba(99,102,241,.25);
-  border-radius:var(--radius);
-}
-.render-timer-label{
-  font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;
-  color:#6366f1;margin-bottom:6px;
-}
-.render-timer-bar-wrap{
-  background:rgba(99,102,241,.15);
-  border-radius:4px;height:6px;overflow:hidden;margin-bottom:6px;
-}
-.render-timer-bar{
-  height:100%;width:100%;
-  background:linear-gradient(90deg,#6366f1,#8b5cf6);
-  border-radius:4px;
-  transition:width .5s linear;
-}
-.render-timer-text{
-  font-size:11px;font-family:var(--font-mono);color:#6366f1;
-}
-.locked-overlay{display:none}
-.all-locked .cmd-btn:not(#btn-wake-render){
-  opacity:.4;pointer-events:none;
-}
-.all-locked #btn-wake-render{
-  background:linear-gradient(135deg,rgba(99,102,241,.08),rgba(139,92,246,.05));
-  border-color:#6366f1;
-}
-
-.api-notice{
-  background:linear-gradient(135deg,rgba(59,130,246,.08),rgba(139,92,246,.08));
-  border:1px solid rgba(59,130,246,.2);
-  border-radius:var(--radius);
-  padding:12px 14px;
-  font-size:11px;
-  color:var(--text-muted);
-  margin-bottom:20px;
-  line-height:1.5;
-}
-.api-notice strong{color:var(--blue)}
-.api-notice code{
-  background:var(--surface2);border:1px solid var(--border);
-  border-radius:3px;padding:1px 5px;
-  font-family:var(--font-mono);font-size:10px;color:var(--blue);
-}
+.progress-wrap{background:var(--border);border-radius:2px;height:2px;overflow:hidden;margin-top:10px}
+.progress-bar{height:100%;background:linear-gradient(90deg,var(--blue),var(--indigo),var(--purple));
+  background-size:200% 100%;border-radius:2px;transition:width .3s;animation:shimmer 2s linear infinite}
+@keyframes shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
+.fade-in{animation:slideIn .22s cubic-bezier(.4,0,.2,1)}
 </style>
 </head>
 <body>
 
-<!-- SIDEBAR -->
 <aside class="sidebar">
   <div class="sb-logo">
-    <div class="sb-logo-mark">SR</div>
-    <div class="sb-site">studyriserr.com</div>
-    <div class="sb-tagline">SEO Intelligence Dashboard</div>
+    <div class="sb-logo-row">
+      <div class="sb-mark">SR</div>
+      <div>
+        <div class="sb-site">studyriserr.com</div>
+        <div class="sb-tagline">SEO Intelligence</div>
+      </div>
+    </div>
   </div>
   <nav class="sb-nav">
     <div class="sb-section">Overview</div>
     <a href="index.html">
-      <svg class="icon" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+      <svg fill="none" stroke="currentColor" stroke-width="1.7" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>
       SEO Overview
     </a>
     <div class="sb-section">Analysis</div>
     <a href="targets.html">
-      <svg class="icon" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>
+      <svg fill="none" stroke="currentColor" stroke-width="1.7" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>
       Target Keywords
     </a>
     <a href="ai-overview.html">
-      <svg class="icon" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 2a10 10 0 1 0 10 10"/><path d="M12 6v6l4 2"/></svg>
+      <svg fill="none" stroke="currentColor" stroke-width="1.7" viewBox="0 0 24 24"><path d="M12 2a10 10 0 1 0 10 10"/><path d="M12 6v6l4 2"/></svg>
       AI Overview
     </a>
     <div class="sb-section">Intelligence</div>
     <a href="seo-advice.html">
-      <svg class="icon" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9.663 17h4.673M12 3v1m6.364 1.636-.707.707M21 12h-1M4 12H3m3.343-5.657-.707-.707m2.828 9.9a5 5 0 1 1 7.072 0l-.548.547A3.374 3.374 0 0 0 14 18.469V19a2 2 0 1 1-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/></svg>
+      <svg fill="none" stroke="currentColor" stroke-width="1.7" viewBox="0 0 24 24"><path d="M9.663 17h4.673M12 3v1m6.364 1.636-.707.707M21 12h-1M4 12H3m3.343-5.657-.707-.707m2.828 9.9a5 5 0 1 1 7.072 0l-.548.547A3.374 3.374 0 0 0 14 18.469V19a2 2 0 1 1-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/></svg>
       SEO Advice
     </a>
     <div class="sb-section">Controls</div>
     <a href="control.html" class="active">
-      <svg class="icon" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M4.93 4.93a10 10 0 0 0 0 14.14"/></svg>
+      <svg fill="none" stroke="currentColor" stroke-width="1.7" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M4.93 4.93a10 10 0 0 0 0 14.14"/></svg>
       Control Panel
     </a>
   </nav>
@@ -452,149 +301,131 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-body);display
   </div>
 </aside>
 
-<!-- MAIN -->
 <div class="main">
   <div class="topbar">
-    <div class="topbar-title">⚙️ Control Panel</div>
+    <div class="topbar-left">
+      <div class="topbar-title">Control Panel</div>
+      <span class="topbar-sep">/</span>
+      <div class="topbar-sub">studyriserr.com</div>
+    </div>
     <div class="api-status">
       <div class="status-dot" id="api-dot"></div>
-      <span id="api-status-text">Checking API...</span>
+      <span id="api-status-text">Checking...</span>
     </div>
   </div>
 
   <div class="content">
-
-    <!-- LEFT: Command buttons -->
     <div class="cmd-panel">
       <div class="cmd-panel-title">Run Commands</div>
-      <div class="cmd-panel-sub">
-        Trigger scans and fetch live data directly from Google Search Console. Results appear in the panel on the right.
-      </div>
+      <div class="cmd-panel-sub">Trigger scans and fetch live data from Google Search Console. Results appear on the right.</div>
 
       <div class="api-notice" id="api-notice">
-        <strong>API Required</strong> — Set <code>RENDER_API_URL</code> in your dashboard config to enable live commands. See setup instructions below.
+        <strong>API Required</strong> — Set <code>RENDER_API_URL</code> in your config to enable live commands.
       </div>
 
       <div class="cmd-group">
-        <div class="cmd-group-label">🚀 Deployment</div>
-
+        <div class="cmd-group-label"><span>Deployment</span></div>
         <button class="cmd-btn btn-render" id="btn-wake-render" onclick="wakeRender()">
           <div class="cmd-btn-icon">🚀</div>
           <div class="cmd-btn-info">
             <div class="cmd-btn-name">Wake Render Server</div>
-            <div class="cmd-btn-desc">Kick-starts the Render deployment from cold sleep — wait 40s before running commands</div>
-            <div class="cmd-btn-tag">/ping</div>
+            <div class="cmd-btn-desc">Boot from cold sleep — locks commands for 40s</div>
+            <span class="cmd-btn-tag">/ping</span>
           </div>
           <div class="cmd-btn-spinner"></div>
         </button>
-
         <div class="render-timer" id="render-timer">
-          <div class="render-timer-label">⏳ Server warming up — commands locked</div>
-          <div class="render-timer-bar-wrap">
-            <div class="render-timer-bar" id="render-timer-bar"></div>
-          </div>
+          <div class="render-timer-label">Server warming up — commands locked</div>
+          <div class="render-timer-bar-wrap"><div class="render-timer-bar" id="render-timer-bar"></div></div>
           <div class="render-timer-text" id="render-timer-text">40s remaining…</div>
         </div>
       </div>
 
       <div class="cmd-group">
-        <div class="cmd-group-label">🔄 Full Operations</div>
-
+        <div class="cmd-group-label"><span>Full Operations</span></div>
         <button class="cmd-btn btn-scan" id="btn-full-scan" onclick="runCommand('full-scan')">
           <div class="cmd-btn-icon">🔍</div>
           <div class="cmd-btn-info">
             <div class="cmd-btn-name">Full Scan</div>
-            <div class="cmd-btn-desc">Fetch GSC data, detect changes, update all sheets and dashboard</div>
-            <div class="cmd-btn-tag">/scan</div>
+            <div class="cmd-btn-desc">Fetch GSC data, detect changes, update all sheets</div>
+            <span class="cmd-btn-tag">/scan</span>
           </div>
           <div class="cmd-btn-spinner"></div>
         </button>
       </div>
 
       <div class="cmd-group">
-        <div class="cmd-group-label">📊 Quick Lookups</div>
-
+        <div class="cmd-group-label"><span>Quick Lookups</span></div>
         <button class="cmd-btn btn-status" id="btn-status" onclick="runCommand('status')">
           <div class="cmd-btn-icon">📋</div>
           <div class="cmd-btn-info">
             <div class="cmd-btn-name">Status Check</div>
-            <div class="cmd-btn-desc">Last scan date, total keywords tracked, scan history</div>
-            <div class="cmd-btn-tag">/status</div>
+            <div class="cmd-btn-desc">Last scan date, total keywords tracked, history</div>
+            <span class="cmd-btn-tag">/status</span>
           </div>
           <div class="cmd-btn-spinner"></div>
         </button>
-
         <button class="cmd-btn btn-top" id="btn-top" onclick="runCommand('top')">
           <div class="cmd-btn-icon">🏆</div>
           <div class="cmd-btn-info">
             <div class="cmd-btn-name">Top Keywords</div>
             <div class="cmd-btn-desc">Top 10 keywords by clicks from latest snapshot</div>
-            <div class="cmd-btn-tag">/top</div>
+            <span class="cmd-btn-tag">/top</span>
           </div>
           <div class="cmd-btn-spinner"></div>
         </button>
       </div>
 
       <div class="cmd-group">
-        <div class="cmd-group-label">📈 Movement Scans</div>
-
+        <div class="cmd-group-label"><span>Movement Scans</span></div>
         <button class="cmd-btn btn-gainers" id="btn-gainers" onclick="runCommand('gainers')">
           <div class="cmd-btn-icon">📈</div>
           <div class="cmd-btn-info">
             <div class="cmd-btn-name">Gainer Scan</div>
             <div class="cmd-btn-desc">Keywords that improved position since last scan</div>
-            <div class="cmd-btn-tag">/gainers</div>
+            <span class="cmd-btn-tag">/gainers</span>
           </div>
           <div class="cmd-btn-spinner"></div>
         </button>
-
         <button class="cmd-btn btn-drops" id="btn-drops" onclick="runCommand('drops')">
           <div class="cmd-btn-icon">📉</div>
           <div class="cmd-btn-info">
             <div class="cmd-btn-name">Drop Scan</div>
-            <div class="cmd-btn-desc">Keywords that dropped position — needs attention</div>
-            <div class="cmd-btn-tag">/drops</div>
+            <div class="cmd-btn-desc">Keywords that dropped — needs attention</div>
+            <span class="cmd-btn-tag">/drops</span>
           </div>
           <div class="cmd-btn-spinner"></div>
         </button>
       </div>
 
       <div class="cmd-group">
-        <div class="cmd-group-label">🎯 Target & AI</div>
-
+        <div class="cmd-group-label"><span>Target &amp; AI</span></div>
         <button class="cmd-btn btn-targets" id="btn-targets" onclick="runCommand('targets')">
           <div class="cmd-btn-icon">🎯</div>
           <div class="cmd-btn-info">
             <div class="cmd-btn-name">Target Scan</div>
             <div class="cmd-btn-desc">Live status of all target seed keywords + variants</div>
-            <div class="cmd-btn-tag">/targets</div>
+            <span class="cmd-btn-tag">/targets</span>
           </div>
           <div class="cmd-btn-spinner"></div>
         </button>
-
         <button class="cmd-btn btn-ai" id="btn-ai" onclick="runCommand('aioverview')">
           <div class="cmd-btn-icon">🤖</div>
           <div class="cmd-btn-info">
             <div class="cmd-btn-name">AI Overview Scan</div>
             <div class="cmd-btn-desc">Check AI Overview citations (uses SerpAPI credits)</div>
-            <div class="cmd-btn-tag">/aioverview</div>
+            <span class="cmd-btn-tag">/aioverview</span>
           </div>
           <div class="cmd-btn-spinner"></div>
         </button>
       </div>
 
-      <!-- Setup instructions -->
-      <div style="margin-top:24px;padding-top:20px;border-top:1px solid var(--border)">
-        <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--text-dim);margin-bottom:10px">Setup</div>
-        <div style="font-size:11px;color:var(--text-muted);line-height:1.7">
-          To enable live commands, deploy <code style="background:var(--surface2);border:1px solid var(--border);border-radius:3px;padding:1px 5px;font-family:var(--font-mono);font-size:10px;color:var(--blue)">api_server.py</code> on Render and set the URL in <code style="background:var(--surface2);border:1px solid var(--border);border-radius:3px;padding:1px 5px;font-family:var(--font-mono);font-size:10px;color:var(--blue)">config.js</code>.
-          <br><br>
-          Without the API, this panel reads from cached JSON data and shows the last known results.
-        </div>
+      <div class="setup-section">
+        <div class="setup-label">Setup</div>
+        <div class="setup-text">Deploy <code>api_server.py</code> on Render and set the URL in <code>config.js</code>. Without the API, this panel reads from cached JSON data.</div>
       </div>
     </div>
 
-    <!-- RIGHT: Results panel -->
     <div class="results-panel">
       <div class="results-header">
         <div class="results-title" id="results-title">Results</div>
@@ -607,133 +438,81 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-body);display
         <div class="empty-state">
           <div class="empty-icon">⚡</div>
           <div class="empty-title">Ready to run</div>
-          <div class="empty-sub">Click any command button on the left to fetch live data and see results here</div>
+          <div class="empty-sub">Click any command on the left to fetch live data</div>
         </div>
       </div>
     </div>
-
   </div>
 </div>
 
 <script>
-
-// Wake up Render on page load (prevents cold start delay on first button click)
-async function wakeUpApi() {
-  if (!API_URL) return;
-  try {
-    await fetch(API_URL + '/', { signal: AbortSignal.timeout(10000) });
-  } catch {}
-}
+async function wakeUpApi(){if(!API_URL)return;try{await fetch(API_URL+'/',{signal:AbortSignal.timeout(10000)})}catch{}}
 wakeUpApi();
-// ── Config ────────────────────────────────────────────────────────
-// Set your Render API URL here after deploying api_server.py
-const API_URL = 'https://rank-tracker-api-aa7k.onrender.com';
-const USE_CACHE = !API_URL;
 
-// ── Sidebar health ────────────────────────────────────────────────
-async function loadSidebar() {
-  try {
-    const r    = await fetch('data/overview.json?t=' + Date.now());
-    const data = await r.json();
-    document.getElementById('sb-updated').textContent = 'Updated ' + data.updated;
-    document.getElementById('sb-score').textContent   = data.health.score + '/100';
-    document.getElementById('sb-label').textContent   = data.health.label;
-    const s = data.health.score;
-    document.getElementById('sb-score').style.color = s >= 80 ? '#10b981' : s >= 60 ? '#f59e0b' : '#ef4444';
-  } catch(e) {}
+// Set your Render API URL here after deploying api_server.py
+const API_URL='https://rank-tracker-api-aa7k.onrender.com';
+const USE_CACHE=!API_URL;
+
+async function loadSidebar(){
+  try{
+    const r=await fetch('data/overview.json?t='+Date.now());
+    const d=await r.json();
+    document.getElementById('sb-updated').textContent='Updated '+d.updated;
+    document.getElementById('sb-score').textContent=d.health.score+'/100';
+    document.getElementById('sb-label').textContent=d.health.label;
+    const s=d.health.score;
+    document.getElementById('sb-score').style.color=s>=80?'var(--green)':s>=60?'var(--amber)':'var(--red)';
+  }catch(e){}
 }
 loadSidebar();
 
-// ── API status check ──────────────────────────────────────────────
-async function checkApiStatus() {
-  const dot  = document.getElementById('api-dot');
-  const text = document.getElementById('api-status-text');
-  const notice = document.getElementById('api-notice');
-
-  if (!API_URL) {
-    dot.className  = 'status-dot offline';
-    text.textContent = 'API not configured — using cached data';
-    return;
-  }
-
-  try {
-    const r = await fetch(API_URL + '/', { signal: AbortSignal.timeout(3000) });
-    if (r.ok) {
-      dot.className    = 'status-dot online';
-      text.textContent = 'API online';
-      notice.style.display = 'none';
-    } else {
-      throw new Error();
-    }
-  } catch {
-    dot.className    = 'status-dot offline';
-    text.textContent = 'API offline — using cached data';
-  }
+async function checkApiStatus(){
+  const dot=document.getElementById('api-dot');
+  const text=document.getElementById('api-status-text');
+  const notice=document.getElementById('api-notice');
+  if(!API_URL){dot.className='status-dot offline';text.textContent='API not configured';return;}
+  try{
+    const r=await fetch(API_URL+'/',{signal:AbortSignal.timeout(3000)});
+    if(r.ok){dot.className='status-dot online';text.textContent='API online';notice.style.display='none';}
+    else throw new Error();
+  }catch{dot.className='status-dot offline';text.textContent='API offline';}
 }
 checkApiStatus();
 
-// ── Helper: position badge ────────────────────────────────────────
-function posBadge(pos) {
-  if (!pos && pos !== 0) return '<span class="pos-badge pos-low">—</span>';
-  const p   = parseFloat(pos);
-  const cls = p <= 1 ? 'pos-1' : p <= 3 ? 'pos-top3' : p <= 10 ? 'pos-top10' : p <= 20 ? 'pos-top20' : 'pos-low';
+function posBadge(pos){
+  if(!pos&&pos!==0)return '<span class="pos-badge pos-low">—</span>';
+  const p=parseFloat(pos);
+  const cls=p<=1?'pos-1':p<=3?'pos-top3':p<=10?'pos-top10':p<=20?'pos-top20':'pos-low';
   return `<span class="pos-badge ${cls}">${p}</span>`;
 }
-
-function deltaBadge(d) {
-  if (!d || d === 0) return '<span class="delta" style="color:var(--text-dim)">—</span>';
-  return `<span class="delta ${d > 0 ? 'up' : 'down'}">${d > 0 ? '+' : ''}${d}</span>`;
+function deltaBadge(d){
+  if(!d||d===0)return '<span class="delta" style="color:var(--text-dim)">—</span>';
+  return `<span class="delta ${d>0?'up':'down'}">${d>0?'+':''}${d}</span>`;
+}
+function now(){return new Date().toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit',second:'2-digit'});}
+function setBtnLoading(id,loading){
+  const btn=document.getElementById(id);
+  if(!btn)return;
+  btn.disabled=loading;btn.classList.toggle('running',loading);
+}
+function clearResults(){
+  document.getElementById('results-body').innerHTML=`<div class="empty-state"><div class="empty-icon">⚡</div><div class="empty-title">Ready to run</div><div class="empty-sub">Click any command on the left to fetch live data</div></div>`;
+  document.getElementById('results-title').textContent='Results';
+  document.getElementById('results-meta').textContent='No command run yet';
 }
 
-function now() {
-  return new Date().toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
-}
-
-// ── Set button loading state ──────────────────────────────────────
-function setBtnLoading(id, loading) {
-  const btn = document.getElementById(id);
-  if (!btn) return;
-  if (loading) {
-    btn.disabled = true;
-    btn.classList.add('running');
-  } else {
-    btn.disabled = false;
-    btn.classList.remove('running');
-  }
-}
-
-// ── Clear results ─────────────────────────────────────────────────
-function clearResults() {
-  document.getElementById('results-body').innerHTML = `
-    <div class="empty-state">
-      <div class="empty-icon">⚡</div>
-      <div class="empty-title">Ready to run</div>
-      <div class="empty-sub">Click any command button on the left to fetch live data</div>
-    </div>`;
-  document.getElementById('results-title').textContent = 'Results';
-  document.getElementById('results-meta').textContent  = 'No command run yet';
-}
-
-// ── Wake Render deployment ────────────────────────────────────────
-function wakeRender() {
-  const btn   = document.getElementById('btn-wake-render');
-  const timer = document.getElementById('render-timer');
-  const bar   = document.getElementById('render-timer-bar');
-  const txt   = document.getElementById('render-timer-text');
-  const panel = document.querySelector('.cmd-panel');
-
-  if (btn.disabled) return;
-
-  // Lock everything
-  btn.disabled = true;
-  btn.classList.add('running');
-  panel.classList.add('all-locked');
-  timer.style.display = 'block';
-
-  // Show result panel feedback
-  document.getElementById('results-title').textContent = '🚀 Waking Render Server';
-  document.getElementById('results-meta').textContent  = `Started at ${now()}`;
-  document.getElementById('results-body').innerHTML = `
+function wakeRender(){
+  const btn=document.getElementById('btn-wake-render');
+  const timer=document.getElementById('render-timer');
+  const bar=document.getElementById('render-timer-bar');
+  const txt=document.getElementById('render-timer-text');
+  const panel=document.querySelector('.cmd-panel');
+  if(btn.disabled)return;
+  btn.disabled=true;btn.classList.add('running');
+  panel.classList.add('all-locked');timer.style.display='block';
+  document.getElementById('results-title').textContent='Waking Render Server';
+  document.getElementById('results-meta').textContent='Started at '+now();
+  document.getElementById('results-body').innerHTML=`
     <div class="result-block fade-in">
       <div class="result-block-header">
         <span class="result-block-icon">🚀</span>
@@ -745,499 +524,131 @@ function wakeRender() {
           <span class="log-line info">▶ Sending wake request to Render…</span>
           <span class="log-cursor"></span>
         </div>
-        <div class="progress-wrap" style="margin-top:10px"><div class="progress-bar" id="wake-main-bar" style="width:5%"></div></div>
+        <div class="progress-wrap"><div class="progress-bar" id="wake-main-bar" style="width:3%"></div></div>
       </div>
     </div>`;
-
-  // Fire the actual ping
-  if (API_URL) {
-    fetch(API_URL + '/', { signal: AbortSignal.timeout(45000) })
-      .then(() => addWakeLog('✅ Server responded — ready!', 'success'))
-      .catch(() => addWakeLog('⚠ No response yet — may still be booting', 'warning'));
+  if(API_URL){
+    fetch(API_URL+'/',{signal:AbortSignal.timeout(45000)})
+      .then(()=>addWakeLog('✓ Server responded — ready','success'))
+      .catch(()=>addWakeLog('⚠ No response yet — still booting','warning'));
   }
-
-  const total = 40;
-  let elapsed = 0;
-  const interval = setInterval(() => {
+  const total=40;let elapsed=0;
+  const iv=setInterval(()=>{
     elapsed++;
-    const pct      = (elapsed / total) * 100;
-    const remaining = total - elapsed;
-
-    bar.style.width = pct + '%';
-    txt.textContent  = remaining > 0 ? `${remaining}s remaining…` : 'Done — commands unlocked!';
-
-    // Update main bar too
-    const mainBar = document.getElementById('wake-main-bar');
-    if (mainBar) mainBar.style.width = pct + '%';
-
-    if (elapsed >= total) {
-      clearInterval(interval);
-      btn.disabled = false;
-      btn.classList.remove('running');
+    const pct=(elapsed/total)*100;
+    bar.style.width=pct+'%';
+    txt.textContent=elapsed<total?(total-elapsed)+'s remaining…':'Done — commands unlocked';
+    const mb=document.getElementById('wake-main-bar');
+    if(mb)mb.style.width=pct+'%';
+    if(elapsed>=total){
+      clearInterval(iv);btn.disabled=false;btn.classList.remove('running');
       panel.classList.remove('all-locked');
-      addWakeLog('✅ 40s elapsed — all commands are now unlocked.', 'success');
-      document.getElementById('results-meta').textContent = `Completed at ${now()}`;
-      setTimeout(() => { timer.style.display = 'none'; }, 3000);
+      addWakeLog('✓ All commands unlocked','success');
+      document.getElementById('results-meta').textContent='Completed at '+now();
+      setTimeout(()=>{timer.style.display='none';},3000);
     }
-  }, 1000);
+  },1000);
+}
+function addWakeLog(msg,type=''){
+  const log=document.getElementById('wake-log');if(!log)return;
+  const cursor=log.querySelector('.log-cursor');
+  const line=document.createElement('span');line.className='log-line '+type;line.textContent=msg;
+  if(cursor)log.insertBefore(line,cursor);else log.appendChild(line);
+  log.scrollTop=log.scrollHeight;
 }
 
-function addWakeLog(msg, type='') {
-  const log = document.getElementById('wake-log');
-  if (!log) return;
-  const cursor = log.querySelector('.log-cursor');
-  const line   = document.createElement('span');
-  line.className   = `log-line ${type}`;
-  line.textContent = msg;
-  if (cursor) log.insertBefore(line, cursor);
-  else log.appendChild(line);
-  log.scrollTop = log.scrollHeight;
+function cmdToEndpoint(cmd){
+  const map={'full-scan':'scan','status':'status','top':'top','gainers':'gainers','drops':'drops','targets':'targets','aioverview':'ai-scan'};
+  return map[cmd]||cmd;
+}
+async function runCommand(cmd){
+  const btnMap={'full-scan':'btn-full-scan','status':'btn-status','top':'btn-top','gainers':'btn-gainers','drops':'btn-drops','targets':'btn-targets','aioverview':'btn-ai'};
+  setBtnLoading(btnMap[cmd],true);
+  document.getElementById('results-title').textContent=cmdTitle(cmd);
+  document.getElementById('results-meta').textContent='Running at '+now()+'…';
+  try{if(API_URL){await runViaApi(cmd);}else{await runFromCache(cmd);}}
+  catch(e){showError(e.message);}
+  finally{setBtnLoading(btnMap[cmd],false);document.getElementById('results-meta').textContent='Completed at '+now();}
+}
+function cmdTitle(cmd){
+  const t={'full-scan':'Full Scan','status':'Status Check','top':'Top Keywords','gainers':'Gainer Scan','drops':'Drop Scan','targets':'Target Scan','aioverview':'AI Overview Scan'};
+  return t[cmd]||cmd;
 }
 
-
-function cmdToEndpoint(cmd) {
-  const map = {
-    'full-scan':  'scan',
-    'status':     'status',
-    'top':        'top',
-    'gainers':    'gainers',
-    'drops':      'drops',
-    'targets':    'targets',
-    'aioverview': 'ai-scan',
-  };
-  return map[cmd] || cmd;
-}
-async function runCommand(cmd) {
-  const btnMap = {
-    'full-scan':  'btn-full-scan',
-    'status':     'btn-status',
-    'top':        'btn-top',
-    'gainers':    'btn-gainers',
-    'drops':      'btn-drops',
-    'targets':    'btn-targets',
-    'aioverview': 'btn-ai',
-  };
-
-  setBtnLoading(btnMap[cmd], true);
-  document.getElementById('results-title').textContent = cmdTitle(cmd);
-  document.getElementById('results-meta').textContent  = `Running at ${now()}...`;
-
-  try {
-    if (API_URL) {
-      await runViaApi(cmd);
-    } else {
-      await runFromCache(cmd);
-    }
-  } catch(e) {
-    showError(e.message);
-  } finally {
-    setBtnLoading(btnMap[cmd], false);
-    document.getElementById('results-meta').textContent = `Completed at ${now()}`;
+async function runViaApi(cmd){
+  const body=document.getElementById('results-body');
+  const isPost=['full-scan','aioverview'].includes(cmd);
+  body.innerHTML=`<div class="result-block"><div class="result-block-header"><span class="result-block-icon">⚡</span><span class="result-block-title">${cmdTitle(cmd)} — Running</span><span class="result-block-time">${now()}</span></div><div class="result-block-body"><div class="log-stream" id="log-stream"><span class="log-line info">▶ Connecting to API…</span><span class="log-cursor"></span></div><div class="progress-wrap"><div class="progress-bar" style="width:30%"></div></div></div></div>`;
+  const log=document.getElementById('log-stream');
+  function addLog(msg,type=''){
+    const cursor=log.querySelector('.log-cursor');
+    const line=document.createElement('span');line.className='log-line '+type;line.textContent=msg;
+    if(cursor)log.insertBefore(line,cursor);else log.appendChild(line);log.scrollTop=log.scrollHeight;
   }
+  addLog('▶ Sending request…','info');
+  const endpoint=cmdToEndpoint(cmd);
+  const response=await fetch(`${API_URL}/${endpoint}`,{method:isPost?'POST':'GET',headers:{'Content-Type':'application/json'}});
+  if(!response.ok)throw new Error('API returned '+response.status);
+  const data=await response.json();
+  addLog('✓ Response received','success');
+  if(isPost){addLog('⏳ Job running…','info');await pollJobCompletion(addLog);}
+  else setTimeout(()=>renderApiResult(cmd,data),300);
 }
-
-function cmdTitle(cmd) {
-  const titles = {
-    'full-scan':  '🔍 Full Scan',
-    'status':     '📋 Status Check',
-    'top':        '🏆 Top Keywords',
-    'gainers':    '📈 Gainer Scan',
-    'drops':      '📉 Drop Scan',
-    'targets':    '🎯 Target Scan',
-    'aioverview': '🤖 AI Overview Scan',
-  };
-  return titles[cmd] || cmd;
-}
-
-// ── API mode ──────────────────────────────────────────────────────
-async function runViaApi(cmd) {
-  const body = document.getElementById('results-body');
-  const isPost = ['full-scan', 'aioverview'].includes(cmd);
-
-  // Show log stream
-  body.innerHTML = `
-    <div class="result-block">
-      <div class="result-block-header">
-        <span class="result-block-icon">⚡</span>
-        <span class="result-block-title">${cmdTitle(cmd)} — Running</span>
-        <span class="result-block-time">${now()}</span>
-      </div>
-      <div class="result-block-body">
-        <div class="log-stream" id="log-stream">
-          <span class="log-line info">▶ Connecting to API...</span>
-          <span class="log-cursor"></span>
-        </div>
-        <div class="progress-wrap"><div class="progress-bar" style="width:30%"></div></div>
-      </div>
-    </div>`;
-
-  const log = document.getElementById('log-stream');
-  function addLog(msg, type='') {
-    const cursor = log.querySelector('.log-cursor');
-    const line   = document.createElement('span');
-    line.className   = `log-line ${type}`;
-    line.textContent = msg;
-    if (cursor) log.insertBefore(line, cursor);
-    else log.appendChild(line);
-    log.scrollTop = log.scrollHeight;
-  }
-
-  addLog('▶ Sending request...', 'info');
-
-  const endpoint = cmdToEndpoint(cmd);
-  const response = await fetch(`${API_URL}/${endpoint}`, {
-    method: isPost ? 'POST' : 'GET',
-    headers: { 'Content-Type': 'application/json' },
-  });
-
-  if (!response.ok) throw new Error(`API returned ${response.status}`);
-
-  const data = await response.json();
-  addLog('✓ Response received', 'success');
-
-  // For POST jobs, poll for completion
-  if (isPost) {
-    addLog('⏳ Job running in background...', 'info');
-    await pollJobCompletion(addLog);
-  } else {
-    setTimeout(() => renderApiResult(cmd, data), 300);
-  }
-}
-
-async function pollJobCompletion(addLog) {
-  return new Promise((resolve) => {
-    const interval = setInterval(async () => {
-      try {
-        const r    = await fetch(`${API_URL}/job-status`);
-        const data = await r.json();
-        if (!data.running && data.last_result) {
-          clearInterval(interval);
-          addLog('✅ Job complete!', 'success');
-          setTimeout(() => renderApiResult('full-scan', data.last_result), 300);
-          resolve();
-        }
-      } catch {}
-    }, 2500);
+async function pollJobCompletion(addLog){
+  return new Promise((resolve)=>{
+    const iv=setInterval(async()=>{
+      try{
+        const r=await fetch(`${API_URL}/job-status`);const d=await r.json();
+        if(!d.running&&d.last_result){clearInterval(iv);addLog('✓ Job complete','success');setTimeout(()=>renderApiResult('full-scan',d.last_result),300);resolve();}
+      }catch{}
+    },2500);
   });
 }
-
-function renderApiResult(cmd, data) {
-  const body = document.getElementById('results-body');
-
-  if (data.error) {
-    showError(data.error);
-    return;
-  }
-
-  // Re-render based on command
-  switch(cmd) {
-    case 'status':     renderStatus(data); break;
-    case 'top':        renderTopKeywords(data); break;
-    case 'gainers':    renderMovers(data, 'gainers'); break;
-    case 'drops':      renderMovers(data, 'drops'); break;
-    case 'targets':    renderTargets(data); break;
-    case 'aioverview': renderAiOverview(data); break;
-    case 'full-scan':  renderFullScan(data); break;
-    default:           renderRaw(data);
+function renderApiResult(cmd,data){
+  if(data.error){showError(data.error);return;}
+  switch(cmd){
+    case 'status':renderStatus(data);break;case 'top':renderTopKeywords(data);break;
+    case 'gainers':renderMovers(data,'gainers');break;case 'drops':renderMovers(data,'drops');break;
+    case 'targets':renderTargets(data);break;case 'aioverview':renderAiOverview(data);break;
+    case 'full-scan':renderFullScan(data);break;default:renderRaw(data);
   }
 }
 
-// ── Cache mode (no API) ───────────────────────────────────────────
-async function runFromCache(cmd) {
-  const body = document.getElementById('results-body');
-
-  body.innerHTML = `
-    <div class="result-block">
-      <div class="result-block-header">
-        <span class="result-block-icon">📦</span>
-        <span class="result-block-title">Reading cached data</span>
-        <span class="result-block-time">${now()}</span>
-      </div>
-      <div class="result-block-body">
-        <div class="log-stream">
-          <span class="log-line warning">⚠ API not configured — showing last cached results</span>
-          <span class="log-line info">▶ Loading from data/*.json...</span>
-        </div>
-      </div>
-    </div>`;
-
-  await new Promise(r => setTimeout(r, 600));
-
-  switch(cmd) {
-    case 'status':     await cacheStatus(); break;
-    case 'top':        await cacheTop(); break;
-    case 'gainers':    await cacheGainers(); break;
-    case 'drops':      await cacheDrops(); break;
-    case 'targets':    await cacheTargets(); break;
-    case 'aioverview': await cacheAi(); break;
-    case 'full-scan':  showCacheNotice('Full Scan requires live API. Deploy api_server.py on Render to enable.'); break;
-    default:           showCacheNotice('Command requires live API.');
+async function runFromCache(cmd){
+  const body=document.getElementById('results-body');
+  body.innerHTML=`<div class="result-block"><div class="result-block-header"><span class="result-block-icon">📦</span><span class="result-block-title">Reading cached data</span><span class="result-block-time">${now()}</span></div><div class="result-block-body"><div class="log-stream"><span class="log-line warning">⚠ API not configured — showing cached results</span><span class="log-line info">▶ Loading from data/*.json…</span></div></div></div>`;
+  await new Promise(r=>setTimeout(r,600));
+  switch(cmd){
+    case 'status':await cacheStatus();break;case 'top':await cacheTop();break;
+    case 'gainers':await cacheGainers();break;case 'drops':await cacheDrops();break;
+    case 'targets':await cacheTargets();break;case 'aioverview':await cacheAi();break;
+    case 'full-scan':showCacheNotice('Full Scan requires live API. Deploy api_server.py on Render to enable.');break;
+    default:showCacheNotice('Command requires live API.');
   }
 }
 
-// ── Cache renderers ───────────────────────────────────────────────
-async function cacheStatus() {
-  const data = await fetch('data/overview.json?t=' + Date.now()).then(r => r.json());
-  const s    = data.stats;
-  renderStatus({
-    last_date:    data.updated,
-    total_kws:    s.total_keywords,
-    avg_pos:      s.avg_position,
-    health_score: data.health.score,
-    health_label: data.health.label,
-    top3:         s.top3,
-    top10:        s.top10,
-    total_clicks: s.total_clicks,
-    total_impr:   s.total_impressions,
-    avg_ctr:      s.avg_ctr,
-  });
-}
+async function cacheStatus(){const d=await fetch('data/overview.json?t='+Date.now()).then(r=>r.json());const s=d.stats;renderStatus({last_date:d.updated,total_kws:s.total_keywords,avg_pos:s.avg_position,health_score:d.health.score,health_label:d.health.label,top3:s.top3,top10:s.top10,total_clicks:s.total_clicks,total_impr:s.total_impressions,avg_ctr:s.avg_ctr});}
+async function cacheTop(){const d=await fetch('data/overview.json?t='+Date.now()).then(r=>r.json());renderTopKeywords({keywords:d.top_keywords});}
+async function cacheGainers(){const d=await fetch('data/overview.json?t='+Date.now()).then(r=>r.json());renderMovers({keywords:d.improved},'gainers');}
+async function cacheDrops(){const d=await fetch('data/overview.json?t='+Date.now()).then(r=>r.json());renderMovers({keywords:d.dropped},'drops');}
+async function cacheTargets(){const d=await fetch('data/targets.json?t='+Date.now()).then(r=>r.json());const flat=(d.keywords||[]).flatMap(g=>g.variants||[]);renderTargets({keywords:flat,summary:d.summary});}
+async function cacheAi(){const d=await fetch('data/ai.json?t='+Date.now()).then(r=>r.json());renderAiOverview({keywords:d.keywords,summary:d.summary});}
 
-async function cacheTop() {
-  const data = await fetch('data/overview.json?t=' + Date.now()).then(r => r.json());
-  renderTopKeywords({ keywords: data.top_keywords });
-}
+function renderStatus(d){document.getElementById('results-body').innerHTML=`<div class="result-block fade-in"><div class="result-block-header"><span class="result-block-icon">📋</span><span class="result-block-title">Status Check</span><span class="result-block-time">${now()}</span></div><div class="result-block-body"><div class="stat-row"><span class="stat-row-label">Last Updated</span><span class="stat-row-value">${d.last_date||'—'}</span></div><div class="stat-row"><span class="stat-row-label">Total Keywords</span><span class="stat-row-value">${d.total_kws||'—'}</span></div><div class="stat-row"><span class="stat-row-label">Avg Position</span><span class="stat-row-value">${d.avg_pos||'—'}</span></div><div class="stat-row"><span class="stat-row-label">Health Score</span><span class="stat-row-value">${d.health_score}/100 — ${d.health_label}</span></div><div class="stat-row"><span class="stat-row-label">Top 3 Keywords</span><span class="stat-row-value">${d.top3||0}</span></div><div class="stat-row"><span class="stat-row-label">Top 10 Keywords</span><span class="stat-row-value">${d.top10||0}</span></div><div class="stat-row"><span class="stat-row-label">Total Clicks (7d)</span><span class="stat-row-value">${d.total_clicks||0}</span></div><div class="stat-row"><span class="stat-row-label">Total Impressions</span><span class="stat-row-value">${d.total_impr||0}</span></div><div class="stat-row"><span class="stat-row-label">Avg CTR</span><span class="stat-row-value">${d.avg_ctr||0}%</span></div></div></div>`;}
 
-async function cacheGainers() {
-  const data = await fetch('data/overview.json?t=' + Date.now()).then(r => r.json());
-  renderMovers({ keywords: data.improved }, 'gainers');
-}
+function renderTopKeywords(d){const kws=d.keywords||[];document.getElementById('results-body').innerHTML=`<div class="result-block fade-in"><div class="result-block-header"><span class="result-block-icon">🏆</span><span class="result-block-title">Top Keywords by Clicks</span><span class="result-block-time">${now()}</span></div><div class="result-block-body">${kws.length?kws.map((k,i)=>`<div class="result-row"><span class="result-row-num">${i+1}</span><span class="result-row-kw">${k.keyword||k.kw||''}</span>${posBadge(k.position||k.pos)}<span class="badge amber" style="min-width:56px;justify-content:center">${k.clicks} clicks</span></div>`).join(''): '<div style="color:var(--text-dim);font-size:11px;padding:10px 0">No data available</div>'}</div></div>`;}
 
-async function cacheDrops() {
-  const data = await fetch('data/overview.json?t=' + Date.now()).then(r => r.json());
-  renderMovers({ keywords: data.dropped }, 'drops');
-}
+function renderMovers(d,type){const kws=d.keywords||[];const isGain=type==='gainers';document.getElementById('results-body').innerHTML=`<div class="result-block fade-in"><div class="result-block-header"><span class="result-block-icon">${isGain?'📈':'📉'}</span><span class="result-block-title">${isGain?'Top Gainers':'Top Drops'}</span><span class="result-block-time">${now()}</span></div><div class="result-block-body">${kws.length?kws.map((k,i)=>{const delta=k.delta||(k.prev-k.current);return `<div class="result-row"><span class="result-row-num">${i+1}</span><span class="result-row-kw">${k.keyword||''}</span><span style="font-size:10.5px;color:var(--text-dim);font-family:var(--mono)">${k.prev||k.previous_position||'?'} → ${k.current||k.position||'?'}</span>${deltaBadge(isGain?Math.abs(delta):-Math.abs(delta))}</div>`;}).join(''):`<div style="color:var(--text-dim);font-size:11px;padding:10px 0">No ${type} today</div>`}</div></div>`;}
 
-async function cacheTargets() {
-  const data = await fetch('data/targets.json?t=' + Date.now()).then(r => r.json());
-  const flat = (data.keywords || []).flatMap(g => g.variants || []);
-  renderTargets({ keywords: flat, summary: data.summary });
-}
+function renderTargets(d){const kws=(d.keywords||[]).slice(0,30);const s=d.summary||{};document.getElementById('results-body').innerHTML=`<div class="result-block fade-in"><div class="result-block-header"><span class="result-block-icon">🎯</span><span class="result-block-title">Target Keywords</span><span class="result-block-time">${now()}</span></div><div class="result-block-body"><div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px"><span class="badge blue">${s.total_variants||kws.length} keywords</span><span class="badge amber">${s.top3||0} Top 3</span><span class="badge green">${s.top10||0} Top 10</span><span class="badge red">${s.not_ranking||0} not ranking</span></div>${kws.map((k,i)=>{const pos=k.position||k.current_position;const pn=parseFloat(pos);const z=!pos||pos==='—'?'❌':pn<=3?'🥇':pn<=10?'🟢':pn<=20?'🟡':'🔴';return `<div class="result-row"><span style="font-size:12px">${z}</span><span class="result-row-kw">${k.keyword||''}</span>${posBadge(pos)}${deltaBadge(k.delta||0)}<span style="font-size:10px;color:var(--text-dim);font-family:var(--mono)">${k.clicks||k.clicks_7d||0}cl</span></div>`;}).join('')}</div></div>`;}
 
-async function cacheAi() {
-  const data = await fetch('data/ai.json?t=' + Date.now()).then(r => r.json());
-  renderAiOverview({ keywords: data.keywords, summary: data.summary });
-}
+function renderAiOverview(d){const kws=d.keywords||[];const s=d.summary||{};document.getElementById('results-body').innerHTML=`<div class="result-block fade-in"><div class="result-block-header"><span class="result-block-icon">🤖</span><span class="result-block-title">AI Overview Status</span><span class="result-block-time">${now()}</span></div><div class="result-block-body"><div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px"><span class="badge blue">${s.total||kws.length} checked</span><span class="badge amber">${s.has_overview||0} have AI Overview</span><span class="badge green">${s.cited||0} cite us</span><span class="badge grey">${s.not_cited||0} not cited</span></div>${kws.map(k=>`<div class="result-row"><span style="font-size:13px">${k.site_cited?'🎯':k.has_overview?'⚡':'—'}</span><span class="result-row-kw">${k.ai_keyword||k.seed||''}</span><span class="badge ${k.site_cited?'green':k.has_overview?'amber':'grey'}">${k.site_cited?'Cited':k.has_overview?'Has Overview':'No Overview'}</span>${k.organic_pos?`<span class="badge blue">#${k.organic_pos}</span>`:''}</div>`).join('')}</div></div>`;}
 
-// ── Render functions ──────────────────────────────────────────────
-function renderStatus(d) {
-  document.getElementById('results-body').innerHTML = `
-    <div class="result-block fade-in">
-      <div class="result-block-header">
-        <span class="result-block-icon">📋</span>
-        <span class="result-block-title">Status Check</span>
-        <span class="result-block-time">${now()}</span>
-      </div>
-      <div class="result-block-body">
-        <div class="stat-row"><span class="stat-row-label">Last Updated</span><span class="stat-row-value">${d.last_date || '—'}</span></div>
-        <div class="stat-row"><span class="stat-row-label">Total Keywords</span><span class="stat-row-value">${d.total_kws || '—'}</span></div>
-        <div class="stat-row"><span class="stat-row-label">Avg Position</span><span class="stat-row-value">${d.avg_pos || '—'}</span></div>
-        <div class="stat-row"><span class="stat-row-label">Health Score</span><span class="stat-row-value">${d.health_score}/100 — ${d.health_label}</span></div>
-        <div class="stat-row"><span class="stat-row-label">Top 3 Keywords</span><span class="stat-row-value">${d.top3 || 0}</span></div>
-        <div class="stat-row"><span class="stat-row-label">Top 10 Keywords</span><span class="stat-row-value">${d.top10 || 0}</span></div>
-        <div class="stat-row"><span class="stat-row-label">Total Clicks (7d)</span><span class="stat-row-value">${d.total_clicks || 0}</span></div>
-        <div class="stat-row"><span class="stat-row-label">Total Impressions</span><span class="stat-row-value">${d.total_impr || 0}</span></div>
-        <div class="stat-row"><span class="stat-row-label">Avg CTR</span><span class="stat-row-value">${d.avg_ctr || 0}%</span></div>
-      </div>
-    </div>`;
-}
+function renderFullScan(d){document.getElementById('results-body').innerHTML=`<div class="result-block fade-in"><div class="result-block-header"><span class="result-block-icon">✅</span><span class="result-block-title">Full Scan Complete</span><span class="result-block-time">${now()}</span></div><div class="result-block-body"><div class="log-stream">${(d.log||['Scan completed']).map(l=>`<span class="log-line ${l.includes('✅')?'success':l.includes('❌')?'error':l.includes('⚠')?'warning':''}">${l}</span>`).join('')}</div>${d.summary?`<div style="margin-top:12px"><div class="stat-row"><span class="stat-row-label">Keywords fetched</span><span class="stat-row-value">${d.summary.total_keywords}</span></div><div class="stat-row"><span class="stat-row-label">Improved</span><span class="stat-row-value" style="color:var(--green)">${d.summary.improved}</span></div><div class="stat-row"><span class="stat-row-label">Dropped</span><span class="stat-row-value" style="color:var(--red)">${d.summary.dropped}</span></div></div>`:''}<div style="margin-top:12px"><a href="index.html" style="color:var(--blue);font-size:11px;text-decoration:none;font-family:var(--mono)">→ View updated dashboard</a></div></div></div>`;}
 
-function renderTopKeywords(d) {
-  const kws = d.keywords || [];
-  document.getElementById('results-body').innerHTML = `
-    <div class="result-block fade-in">
-      <div class="result-block-header">
-        <span class="result-block-icon">🏆</span>
-        <span class="result-block-title">Top Keywords by Clicks</span>
-        <span class="result-block-time">${now()}</span>
-      </div>
-      <div class="result-block-body">
-        ${kws.length ? kws.map((k, i) => `
-          <div class="result-row">
-            <span class="result-row-num">${i + 1}</span>
-            <span class="result-row-kw">${k.keyword || k.kw || ''}</span>
-            ${posBadge(k.position || k.pos)}
-            <span class="badge amber" style="min-width:60px;justify-content:center">${k.clicks} clicks</span>
-          </div>`).join('') :
-          '<div style="color:var(--text-dim);font-size:12px;padding:12px 0">No data available</div>'
-        }
-      </div>
-    </div>`;
-}
-
-function renderMovers(d, type) {
-  const kws      = d.keywords || [];
-  const isGain   = type === 'gainers';
-  const icon     = isGain ? '📈' : '📉';
-  const title    = isGain ? 'Top Gainers' : 'Top Drops';
-  const badgeCls = isGain ? 'green' : 'red';
-
-  document.getElementById('results-body').innerHTML = `
-    <div class="result-block fade-in">
-      <div class="result-block-header">
-        <span class="result-block-icon">${icon}</span>
-        <span class="result-block-title">${title}</span>
-        <span class="result-block-time">${now()}</span>
-      </div>
-      <div class="result-block-body">
-        ${kws.length ? kws.map((k, i) => {
-          const delta = k.delta || (k.prev - k.current);
-          return `
-            <div class="result-row">
-              <span class="result-row-num">${i + 1}</span>
-              <span class="result-row-kw">${k.keyword || ''}</span>
-              <span style="font-size:11px;color:var(--text-dim);font-family:var(--font-mono)">${k.prev || k.previous_position || '?'} → ${k.current || k.position || '?'}</span>
-              ${deltaBadge(isGain ? Math.abs(delta) : -Math.abs(delta))}
-            </div>`;
-        }).join('') :
-        `<div style="color:var(--text-dim);font-size:12px;padding:12px 0">No ${type} today</div>`
-        }
-      </div>
-    </div>`;
-}
-
-function renderTargets(d) {
-  const kws = (d.keywords || []).slice(0, 30);
-  const s   = d.summary || {};
-
-  document.getElementById('results-body').innerHTML = `
-    <div class="result-block fade-in">
-      <div class="result-block-header">
-        <span class="result-block-icon">🎯</span>
-        <span class="result-block-title">Target Keywords</span>
-        <span class="result-block-time">${now()}</span>
-      </div>
-      <div class="result-block-body">
-        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px">
-          <span class="badge blue">${s.total_variants || kws.length} keywords</span>
-          <span class="badge amber">${s.top3 || 0} in Top 3</span>
-          <span class="badge green">${s.top10 || 0} in Top 10</span>
-          <span class="badge red">${s.not_ranking || 0} not ranking</span>
-        </div>
-        ${kws.map((k, i) => {
-          const pos = k.position || k.current_position;
-          const posNum = parseFloat(pos);
-          const zone = !pos || pos === '—' ? '❌' : posNum <= 3 ? '🥇' : posNum <= 10 ? '🟢' : posNum <= 20 ? '🟡' : '🔴';
-          const delta = k.delta || 0;
-          return `
-            <div class="result-row">
-              <span style="font-size:12px">${zone}</span>
-              <span class="result-row-kw">${k.keyword || ''}</span>
-              ${posBadge(pos)}
-              ${deltaBadge(delta)}
-              <span style="font-size:10px;color:var(--text-dim);font-family:var(--font-mono)">${k.clicks || k.clicks_7d || 0}cl</span>
-            </div>`;
-        }).join('')}
-      </div>
-    </div>`;
-}
-
-function renderAiOverview(d) {
-  const kws = d.keywords || [];
-  const s   = d.summary || {};
-
-  document.getElementById('results-body').innerHTML = `
-    <div class="result-block fade-in">
-      <div class="result-block-header">
-        <span class="result-block-icon">🤖</span>
-        <span class="result-block-title">AI Overview Status</span>
-        <span class="result-block-time">${now()}</span>
-      </div>
-      <div class="result-block-body">
-        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px">
-          <span class="badge blue">${s.total || kws.length} checked</span>
-          <span class="badge amber">${s.has_overview || 0} have AI Overview</span>
-          <span class="badge green">${s.cited || 0} cite us</span>
-          <span class="badge grey">${s.not_cited || 0} not cited</span>
-        </div>
-        ${kws.map(k => `
-          <div class="result-row">
-            <span style="font-size:14px">${k.site_cited ? '🎯' : k.has_overview ? '⚡' : '—'}</span>
-            <span class="result-row-kw">${k.ai_keyword || k.seed || ''}</span>
-            <span class="badge ${k.site_cited ? 'green' : k.has_overview ? 'amber' : 'grey'}">
-              ${k.site_cited ? 'Cited' : k.has_overview ? 'Has Overview' : 'No Overview'}
-            </span>
-            ${k.organic_pos ? `<span class="badge blue">Pos #${k.organic_pos}</span>` : ''}
-          </div>`).join('')}
-      </div>
-    </div>`;
-}
-
-function renderFullScan(d) {
-  document.getElementById('results-body').innerHTML = `
-    <div class="result-block fade-in">
-      <div class="result-block-header">
-        <span class="result-block-icon">✅</span>
-        <span class="result-block-title">Full Scan Complete</span>
-        <span class="result-block-time">${now()}</span>
-      </div>
-      <div class="result-block-body">
-        <div class="log-stream">
-          ${(d.log || ['Scan completed successfully']).map(l =>
-            `<span class="log-line ${l.includes('✅') ? 'success' : l.includes('❌') ? 'error' : l.includes('⚠') ? 'warning' : ''}">${l}</span>`
-          ).join('')}
-        </div>
-        ${d.summary ? `
-          <div style="margin-top:14px">
-            <div class="stat-row"><span class="stat-row-label">Keywords fetched</span><span class="stat-row-value">${d.summary.total_keywords}</span></div>
-            <div class="stat-row"><span class="stat-row-label">Improved</span><span class="stat-row-value" style="color:var(--green)">${d.summary.improved}</span></div>
-            <div class="stat-row"><span class="stat-row-label">Dropped</span><span class="stat-row-value" style="color:var(--red)">${d.summary.dropped}</span></div>
-          </div>` : ''}
-        <div style="margin-top:14px">
-          <a href="index.html" style="color:var(--blue);font-size:12px;text-decoration:none;font-family:var(--font-mono)">
-            → View updated dashboard
-          </a>
-        </div>
-      </div>
-    </div>`;
-}
-
-function renderRaw(d) {
-  document.getElementById('results-body').innerHTML = `
-    <div class="result-block fade-in">
-      <div class="result-block-header">
-        <span class="result-block-icon">📄</span>
-        <span class="result-block-title">Raw Result</span>
-        <span class="result-block-time">${now()}</span>
-      </div>
-      <div class="result-block-body">
-        <div class="log-stream">${JSON.stringify(d, null, 2)}</div>
-      </div>
-    </div>`;
-}
-
-function showError(msg) {
-  document.getElementById('results-body').innerHTML = `
-    <div class="result-block fade-in">
-      <div class="result-block-header">
-        <span class="result-block-icon">❌</span>
-        <span class="result-block-title">Error</span>
-        <span class="result-block-time">${now()}</span>
-      </div>
-      <div class="result-block-body">
-        <div class="log-stream">
-          <span class="log-line error">✖ ${msg}</span>
-        </div>
-      </div>
-    </div>`;
-}
-
-function showCacheNotice(msg) {
-  document.getElementById('results-body').innerHTML = `
-    <div class="result-block fade-in">
-      <div class="result-block-header">
-        <span class="result-block-icon">📦</span>
-        <span class="result-block-title">API Required</span>
-        <span class="result-block-time">${now()}</span>
-      </div>
-      <div class="result-block-body">
-        <div class="log-stream">
-          <span class="log-line warning">⚠ ${msg}</span>
-          <span class="log-line info">▶ Deploy api_server.py on Render to enable live commands</span>
-        </div>
-      </div>
-    </div>`;
-}
+function renderRaw(d){document.getElementById('results-body').innerHTML=`<div class="result-block fade-in"><div class="result-block-header"><span class="result-block-icon">📄</span><span class="result-block-title">Raw Result</span><span class="result-block-time">${now()}</span></div><div class="result-block-body"><div class="log-stream">${JSON.stringify(d,null,2)}</div></div></div>`;}
+function showError(msg){document.getElementById('results-body').innerHTML=`<div class="result-block fade-in"><div class="result-block-header"><span class="result-block-icon">❌</span><span class="result-block-title">Error</span><span class="result-block-time">${now()}</span></div><div class="result-block-body"><div class="log-stream"><span class="log-line error">✖ ${msg}</span></div></div></div>`;}
+function showCacheNotice(msg){document.getElementById('results-body').innerHTML=`<div class="result-block fade-in"><div class="result-block-header"><span class="result-block-icon">📦</span><span class="result-block-title">API Required</span><span class="result-block-time">${now()}</span></div><div class="result-block-body"><div class="log-stream"><span class="log-line warning">⚠ ${msg}</span><span class="log-line info">▶ Deploy api_server.py on Render to enable live commands</span></div></div></div>`;}
 </script>
 </body>
 </html>
