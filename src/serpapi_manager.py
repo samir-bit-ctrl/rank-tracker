@@ -31,28 +31,39 @@ def _current_month() -> str:
 
 
 def get_all_accounts_status() -> list:
-    """
-    Returns status of all configured accounts.
-    Used by control panel to display credit counters.
-    """
     usage  = _load_usage()
     month  = _current_month()
     result = []
 
-    # Include legacy single key if set and not in accounts list
-    accounts = SERPAPI_ACCOUNTS.copy()
-    if SERPAPI_KEY and not any(a["key"] == SERPAPI_KEY for a in accounts):
-        accounts.insert(0, {"name": "Default", "key": SERPAPI_KEY, "limit": 100})
+    accounts = SERPAPI_ACCOUNTS if isinstance(SERPAPI_ACCOUNTS, list) else []
+
+    # Include legacy single key if not already in list
+    if SERPAPI_KEY and not any(a.get("key") == SERPAPI_KEY for a in accounts):
+        accounts = [{"name": "Default", "key": SERPAPI_KEY, "limit": 100}] + accounts
+
+    if not accounts:
+        return [{
+            "name":      "No accounts configured",
+            "key_hint":  "—",
+            "limit":     0,
+            "used":      0,
+            "remaining": 0,
+            "pct":       0,
+            "active":    False,
+            "month":     month,
+        }]
 
     for acc in accounts:
-        key        = acc.get("key", "")
-        limit      = acc.get("limit", 100)
-        used       = usage.get(key, {}).get(month, 0) if key else 0
-        remaining  = max(0, limit - used)
-        pct        = round(used / limit * 100) if limit > 0 else 0
+        if not isinstance(acc, dict):
+            continue
+        key       = acc.get("key", "")
+        limit     = acc.get("limit", 100)
+        used      = usage.get(key, {}).get(month, 0) if key else 0
+        remaining = max(0, limit - used)
+        pct       = round(used / limit * 100) if limit > 0 else 0
 
         result.append({
-            "name":      acc["name"],
+            "name":      acc.get("name", "Unknown"),
             "key_hint":  key[:8] + "..." if key else "not set",
             "limit":     limit,
             "used":      used,

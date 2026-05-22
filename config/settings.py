@@ -26,12 +26,7 @@ SERPAPI_ACCOUNTS = [
         "name":  "Account 1",
         "key":   os.environ.get("SERPAPI_KEY_1", ""),
         "limit": 250,
-    },
-    """{
-        "name":  "Account 2",
-        "key":   os.environ.get("SERPAPI_KEY_2", ""),
-        "limit": 250,
-    },"""
+    }
     # Add more as needed
 ]
 
