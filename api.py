@@ -12,6 +12,7 @@ from src.serpapi_manager import get_all_accounts_status, reset_usage
 import json
 import os
 import sys
+from src.aio_extractor import run_aio_extractor
 
 # Add project root to path
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
@@ -134,6 +135,49 @@ def get_status():
         **history_info,
         **overview,
     }
+
+# ══════════════════════════════════════════════════════════════════════
+#  AIO extractor local
+# ══════════════════════════════════════════════════════════════════════
+def _run_aio_local(keywords: list = None):
+    _set_running("AIO Local Scraper")
+    try:
+        from src.credentials_loader import setup_credentials
+        setup_credentials()
+
+        result = run_aio_extractor(
+            keywords    = keywords,
+            use_cache   = False,   # force fresh when triggered manually
+            write_sheet = True,
+            write_json  = True,
+        )
+
+        if not result:
+            _set_done({"success": False, "message": "No results returned"})
+            return
+
+        s = result["summary"]
+        _set_done({
+            "success":   True,
+            "message":   "AIO extraction complete (free scraper)",
+            "total":     s["total"],
+            "has_aio":   s["has_aio"],
+            "cited":     s["cited"],
+            "not_cited": s["not_cited"],
+        })
+    except Exception as e:
+        _set_done({"success": False, "message": str(e)})
+
+
+@app.post("/aio-local")
+def trigger_aio_local(background_tasks: BackgroundTasks):
+    if _is_running():
+        return JSONResponse(status_code=409,
+            content={"error": f"Job already running: {_job_status['current_job']}"})
+    background_tasks.add_task(_run_aio_local)
+    return {"message": "AIO local scraper started", "job": "AIO Local Scraper"}
+
+
 
 
 # ══════════════════════════════════════════════════════════════════════

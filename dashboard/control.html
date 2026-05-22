@@ -151,6 +151,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);display:flex
 .btn-drops {--btn-accent:var(--red);   --btn-icon-bg:var(--red-dim)}
 .btn-targets{--btn-accent:var(--cyan); --btn-icon-bg:var(--cyan-dim)}
 .btn-ai    {--btn-accent:var(--purple);--btn-icon-bg:var(--purple-dim)}
+.btn-aio{--btn-accent:var(--green);--btn-icon-bg:var(--green-bg)}
 
 /* RENDER TIMER */
 .render-timer{display:none;margin-top:5px;padding:10px 12px;
@@ -440,6 +441,15 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);display:flex
           </div>
           <div class="cmd-btn-spinner"></div>
         </button>
+        <button class="cmd-btn btn-aio" id="btn-aio-local" onclick="runCommand('aio-local')">
+          <div class="cmd-btn-icon">🆓</div>
+          <div class="cmd-btn-info">
+            <div class="cmd-btn-name">AIO Local Scan</div>
+            <div class="cmd-btn-desc">Free Playwright scraper — extracts AI Overview citations without using SerpAPI credits</div>
+            <div class="cmd-btn-tag">/aio-local · no credits used</div>
+          </div>
+          <div class="cmd-btn-spinner"></div>
+        </button>
       </div>
 
       <div class="setup-section">
@@ -649,11 +659,11 @@ function addWakeLog(msg,type=''){
 }
 
 function cmdToEndpoint(cmd){
-  const map={'full-scan':'scan','status':'status','top':'top','gainers':'gainers','drops':'drops','targets':'targets','aioverview':'ai-scan'};
+  const map={'full-scan':'scan','status':'status','top':'top','gainers':'gainers','drops':'drops','targets':'targets','aioverview':'ai-scan','aio-local': 'aio-local',};
   return map[cmd]||cmd;
 }
 async function runCommand(cmd){
-  const btnMap={'full-scan':'btn-full-scan','status':'btn-status','top':'btn-top','gainers':'btn-gainers','drops':'btn-drops','targets':'btn-targets','aioverview':'btn-ai'};
+  const btnMap={'full-scan':'btn-full-scan','status':'btn-status','top':'btn-top','gainers':'btn-gainers','drops':'btn-drops','targets':'btn-targets','aioverview':'btn-ai','aio-local': 'btn-aio-local',};
   setBtnLoading(btnMap[cmd],true);
   document.getElementById('results-title').textContent=cmdTitle(cmd);
   document.getElementById('results-meta').textContent='Running at '+now()+'…';
@@ -662,7 +672,7 @@ async function runCommand(cmd){
   finally{setBtnLoading(btnMap[cmd],false);document.getElementById('results-meta').textContent='Completed at '+now();}
 }
 function cmdTitle(cmd){
-  const t={'full-scan':'Full Scan','status':'Status Check','top':'Top Keywords','gainers':'Gainer Scan','drops':'Drop Scan','targets':'Target Scan','aioverview':'AI Overview Scan'};
+  const t={'full-scan':'Full Scan','status':'Status Check','top':'Top Keywords','gainers':'Gainer Scan','drops':'Drop Scan','targets':'Target Scan','aioverview':'AI Overview Scan','aio-local': '🆓 AIO Local Scan',};
   return t[cmd]||cmd;
 }
 
@@ -702,6 +712,7 @@ function renderApiResult(cmd,data){
     case 'gainers':renderMovers(data,'gainers');break;case 'drops':renderMovers(data,'drops');break;
     case 'targets':renderTargets(data);break;case 'aioverview':renderAiOverview(data);break;
     case 'full-scan':renderFullScan(data);break;default:renderRaw(data);
+    case 'aio-local': renderAiOverview(data); break;
   }
 }
 

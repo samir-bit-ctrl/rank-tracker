@@ -18,6 +18,12 @@ jobs:
         with:
           fetch-depth: 0
 
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Install Playwright browsers
+        run: playwright install chromium --with-deps
+
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
@@ -31,7 +37,7 @@ jobs:
           GSC_CREDENTIALS: ${{ secrets.GSC_CREDENTIALS }}
           SHEET_ID:        ${{ secrets.SHEET_ID }}
           SITE_URL:        ${{ secrets.SITE_URL }}
-          SERPAPI_KEY:     ${{ secrets.SERPAPI_KEY }}
+          SERPAPI_KEY_1:     ${{ secrets.SERPAPI_KEY_1 }}
         run: python main.py
 
       - name: Commit history back to main

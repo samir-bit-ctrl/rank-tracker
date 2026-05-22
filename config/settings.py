@@ -38,3 +38,19 @@ SERPAPI_KEY = os.environ.get("SERPAPI_KEY", "")
 GITHUB_USERNAME = "samir-bit-ctrl"
 GITHUB_REPO     = "rank-tracker"
 DASHBOARD_URL   = f"https://{GITHUB_USERNAME}.github.io/{GITHUB_REPO}/"
+
+
+
+
+# ── AIO Extractor (Free Playwright scraper) ───────────────────────
+# Manual keyword list — leave empty to auto-select from history
+TRACKED_KEYWORDS = [
+    # Add specific keywords you always want to check
+    # e.g. "jee mains syllabus", "neet eligibility criteria"
+]
+
+# Max keywords to auto-select from history when TRACKED_KEYWORDS is empty
+AIO_MAX_KEYWORDS = 50
+
+# Cache duration in hours (avoids re-scraping same keyword)
+AIO_CACHE_HOURS = 24

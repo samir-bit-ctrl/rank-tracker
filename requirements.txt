@@ -8,3 +8,4 @@ python-dotenv
 google-search-results
 fastapi
 uvicorn[standard]
+playwright
