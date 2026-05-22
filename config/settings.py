@@ -19,8 +19,25 @@ SHEET_NAME_LOST_NEW   = "💀 Lost & New"
 # ── Thresholds ────────────────────────────────────────────────────────
 POSITION_CHANGE_THRESHOLD = 3
 
-# ── AI OVERVIEW ────────────────────────────────────────────────────────
+# ── SerpAPI — Multiple accounts ───────────────────────────────────
+# Add as many accounts as you have
+SERPAPI_ACCOUNTS = [
+    {
+        "name":  "Account 1",
+        "key":   os.environ.get("SERPAPI_KEY_1", ""),
+        "limit": 250,
+    },
+    """{
+        "name":  "Account 2",
+        "key":   os.environ.get("SERPAPI_KEY_2", ""),
+        "limit": 250,
+    },"""
+    # Add more as needed
+]
+
+# Legacy single key support
 SERPAPI_KEY = os.environ.get("SERPAPI_KEY", "")
+
 
 # ── Dashboard ─────────────────────────────────────────────────────────
 GITHUB_USERNAME = "samir-bit-ctrl"

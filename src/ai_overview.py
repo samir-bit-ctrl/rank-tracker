@@ -33,25 +33,35 @@ SUBTLE_TEXT  = {"red": 0.420, "green": 0.447, "blue": 0.502}
 # ══════════════════════════════════════════════════════════════════════
 #  SERP FETCH
 # ══════════════════════════════════════════════════════════════════════
-def check_ai_overview(keyword: str, site: str) -> dict:
-    """
-    Check if a keyword has an AI Overview and if our site is cited.
-    Returns structured result dict.
-    """
-    if not SERPAPI_KEY:
-        return {"error": "No SERPAPI_KEY configured"}
+# At top of file, replace SERPAPI_KEY import:
+from src.serpapi_manager import get_active_key, record_usage
+
+
+def check_ai_overview(keyword: str, site: str, api_key: str = None) -> dict:
+    """Check AI Overview for a keyword. Uses provided key or gets active one."""
+    key = api_key or get_active_key()
+    if not key:
+        return {
+            "keyword":      keyword,
+            "has_overview": False,
+            "site_cited":   False,
+            "error":        "All SerpAPI accounts exhausted",
+            "checked_at":   datetime.now().strftime("%Y-%m-%d %H:%M"),
+        }
 
     try:
         search = GoogleSearch({
-            "q":           keyword,
-            "api_key":     SERPAPI_KEY,
-            "gl":          "in",      # India
-            "hl":          "en",
-            "num":         10,
-            "no_cache":    False,     # use cache to save credits
+            "q":        keyword,
+            "api_key":  key,
+            "gl":       "in",
+            "hl":       "en",
+            "num":      10,
+            "no_cache": False,
         })
-
         results = search.get_dict()
+
+        # Record usage
+        record_usage(key, 1)
 
         # ── Check for AI Overview ─────────────────────────────────────
         ai_overview  = results.get("ai_overview", {})
@@ -527,10 +537,15 @@ def build_ai_alert(results: list) -> str:
 # ══════════════════════════════════════════════════════════════════════
 #  MAIN ENTRY
 # ══════════════════════════════════════════════════════════════════════
-def run_ai_overview_check():
-    """Full pipeline for AI Overview checking."""
-    if not SERPAPI_KEY:
-        print("⚠️  SERPAPI_KEY not set — skipping AI Overview check")
+def run_ai_overview_check(keywords_override: list = None):
+    """
+    Full pipeline for AI Overview checking.
+    keywords_override: pass a specific list to check only those keywords.
+    If None, reads from Target Keywords sheet.
+    """
+    active_key = get_active_key()
+    if not active_key:
+        print("⚠️  All SerpAPI accounts exhausted — skipping AI Overview check")
         return None
 
     print("\n🤖 Running AI Overview Check...")
@@ -541,38 +556,50 @@ def run_ai_overview_check():
     sheets_client = gspread.authorize(creds)
     spreadsheet   = sheets_client.open_by_key(SHEET_ID)
 
-    # Read keywords
-    targets = read_target_keywords_simple(spreadsheet)
+    # Use override list or read from sheet
+    if keywords_override:
+        targets = [{"seed": k, "ai_keyword": k} for k in keywords_override]
+    else:
+        targets = read_target_keywords_simple(spreadsheet)
+
     if not targets:
         print("⚠️  No keywords found")
         return None
 
-    # Deduplicate by ai_keyword to avoid wasting credits
-    seen       = set()
-    unique     = []
+    # Deduplicate
+    seen   = set()
+    unique = []
     for t in targets:
         if t["ai_keyword"] not in seen:
             seen.add(t["ai_keyword"])
             unique.append(t)
 
-    # Cap at 25 for free tier safety
-    unique = unique[:25]
-    print(f"\n🔍 Checking {len(unique)} unique keywords "
-          f"(capped at 25 for free tier)...")
+    # Check remaining credits across all accounts
+    from src.serpapi_manager import get_all_accounts_status
+    statuses   = get_all_accounts_status()
+    total_left = sum(s["remaining"] for s in statuses)
+
+    if total_left < len(unique):
+        print(f"⚠️  Only {total_left} credits left, checking {total_left} keywords")
+        unique = unique[:total_left]
+
+    print(f"🔍 Checking {len(unique)} keywords "
+          f"({total_left} credits available across all accounts)...")
 
     results = []
     for i, target in enumerate(unique):
+        # Get fresh active key for each request (handles mid-run switching)
+        current_key = get_active_key()
+        if not current_key:
+            print(f"\n⚠️  Ran out of credits at keyword {i+1}. Stopping.")
+            break
+
         ai_kw = target["ai_keyword"]
         seed  = target["seed"]
-
-        label = f"'{ai_kw}'" + (
-            f" (seed: {seed})" if ai_kw != seed else ""
-        )
+        label = f"'{ai_kw}'" + (f" (seed: {seed})" if ai_kw != seed else "")
         print(f"  [{i+1}/{len(unique)}] {label}...", end=" ")
 
-        result = check_ai_overview(ai_kw, "studyriserr.com")
-
-        # Tag with seed for reference
+        result = check_ai_overview(ai_kw, "studyriserr.com", current_key)
         result["seed"]       = seed
         result["ai_keyword"] = ai_kw
 
@@ -585,22 +612,11 @@ def run_ai_overview_check():
             print("— no AI Overview")
 
         results.append(result)
-
-        # Rate limiting
         if i < len(unique) - 1:
-            time.sleep(1.5)
+            time.sleep(1.2)
 
-    # Write sheet
     write_ai_overview_sheet(spreadsheet, results)
-
-    # Build alert
     alert = build_ai_alert(results)
 
-    # Show credit summary
-    if results:
-        last = results[-1]
-        credits_left = last.get("credits_left", "?")
-        print(f"\n💳 Credits remaining: {credits_left}")
-        print(f"✅ AI Overview check complete — {len(results)} keywords")
-
+    print(f"\n✅ AI Overview check complete — {len(results)} keywords checked")
     return {"results": results, "alert": alert}

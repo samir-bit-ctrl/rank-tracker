@@ -1,5 +1,5 @@
 credentials.json
-venv/
+rank-venv/
 __pycache__/
 .env
 *.pyc

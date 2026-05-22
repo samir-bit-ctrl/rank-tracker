@@ -8,6 +8,7 @@ from fastapi import FastAPI, BackgroundTasks
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from datetime import datetime
+from src.serpapi_manager import get_all_accounts_status, reset_usage
 import json
 import os
 import sys
@@ -17,6 +18,9 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
 from dotenv import load_dotenv
 load_dotenv()
+
+
+
 
 app = FastAPI(title="SEO Rank Tracker API", version="1.0.0")
 
@@ -52,6 +56,29 @@ def _set_done(result: dict):
     _job_status["last_run"]    = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     _job_status["last_result"] = result
 
+# ══════════════════════════════════════════════════════════════════════
+#  MULTI-ACCOUNT HANDLING
+# ══════════════════════════════════════════════════════════════════════
+@app.get("/serpapi-credits")
+def get_serpapi_credits():
+    """Get credit usage for all SerpAPI accounts."""
+    try:
+        return {
+            "accounts": get_all_accounts_status(),
+            "month":    __import__('datetime').datetime.now().strftime("%Y-%m")
+        }
+    except Exception as e:
+        return JSONResponse(status_code=500, content={"error": str(e)})
+
+
+@app.post("/serpapi-reset")
+def reset_serpapi_credits(key_hint: str = None):
+    """Reset usage counter (call after renewing an account)."""
+    try:
+        reset_usage()
+        return {"success": True, "message": "Usage counters reset"}
+    except Exception as e:
+        return JSONResponse(status_code=500, content={"error": str(e)})
 
 # ══════════════════════════════════════════════════════════════════════
 #  HEALTH
@@ -63,31 +90,49 @@ def root():
 
 @app.get("/status")
 def get_status():
-    """Current job status + last scan info."""
     history_file = "data/history.json"
     history_info = {}
-
     if os.path.exists(history_file):
         try:
             with open(history_file) as f:
                 h = json.load(f)
             dates = sorted(h.keys())
             if dates:
-                last   = dates[-1]
+                last = dates[-1]
                 history_info = {
-                    "last_scan_date": last,
-                    "total_keywords": len(h[last]),
+                    "last_date":       last,          # ← renamed
+                    "total_kws":       len(h[last]),  # ← renamed
                     "total_snapshots": len(dates),
                     "dates_available": dates[-7:],
                 }
         except Exception:
             pass
 
+    # Also pull from overview.json for health/clicks/ctr
+    overview = {}
+    try:
+        with open("dashboard/data/overview.json") as f:
+            ov = json.load(f)
+        s = ov.get("stats", {})
+        overview = {
+            "avg_pos":      s.get("avg_position", "—"),
+            "health_score": ov["health"]["score"],
+            "health_label": ov["health"]["label"],
+            "top3":         s.get("top3", 0),
+            "top10":        s.get("top10", 0),
+            "total_clicks": s.get("total_clicks", 0),
+            "total_impr":   s.get("total_impressions", 0),
+            "avg_ctr":      s.get("avg_ctr", 0),
+        }
+    except Exception:
+        pass
+
     return {
-        "job_running":   _job_status["running"],
-        "current_job":   _job_status["current_job"],
-        "last_run":      _job_status["last_run"],
-        **history_info
+        "job_running": _job_status["running"],
+        "current_job": _job_status["current_job"],
+        "last_run":    _job_status["last_run"],
+        **history_info,
+        **overview,
     }
 
 
@@ -192,16 +237,15 @@ def get_top_keywords(n: int = 10):
 # ══════════════════════════════════════════════════════════════════════
 @app.get("/gainers")
 def get_gainers(limit: int = 15):
-    """Today's top gaining keywords."""
     try:
         from src.analyzer import analyze_changes
         report = analyze_changes()
         if not report:
-            return {"gainers": [], "message": "No data yet"}
+            return {"keywords": [], "message": "No data yet"}
         return {
-            "date":    report["today_date"],
-            "vs":      report["yesterday_date"],
-            "gainers": [
+            "date":     report["today_date"],
+            "vs":       report["yesterday_date"],
+            "keywords": [   # ← changed from "gainers" to "keywords"
                 {
                     "keyword":  k["keyword"],
                     "prev":     k["previous_position"],
@@ -218,16 +262,15 @@ def get_gainers(limit: int = 15):
 
 @app.get("/drops")
 def get_drops(limit: int = 15):
-    """Today's top dropping keywords."""
     try:
         from src.analyzer import analyze_changes
         report = analyze_changes()
         if not report:
-            return {"drops": [], "message": "No data yet"}
+            return {"keywords": [], "message": "No data yet"}
         return {
-            "date":  report["today_date"],
-            "vs":    report["yesterday_date"],
-            "drops": [
+            "date":     report["today_date"],
+            "vs":       report["yesterday_date"],
+            "keywords": [   # ← changed from "drops" to "keywords"
                 {
                     "keyword": k["keyword"],
                     "prev":    k["previous_position"],
@@ -302,10 +345,19 @@ def trigger_target_scan(background_tasks: BackgroundTasks):
 
 @app.get("/targets")
 def get_targets():
-    """Current target keyword intel from latest JSON."""
     try:
         with open("dashboard/data/targets.json") as f:
-            return json.load(f)
+            data = json.load(f)
+        # Flatten variants for the control panel renderer
+        flat = []
+        for group in data.get("keywords", []):
+            for v in group.get("variants", []):
+                v["seed"] = group["seed"]
+                flat.append(v)
+        return {
+            "keywords": flat,
+            "summary":  data.get("summary", {})
+        }
     except Exception as e:
         return JSONResponse(status_code=404,
                             content={"error": "No target data yet. Run a target scan first."})
@@ -314,7 +366,7 @@ def get_targets():
 # ══════════════════════════════════════════════════════════════════════
 #  AI OVERVIEW SCAN
 # ══════════════════════════════════════════════════════════════════════
-def _run_ai_scan():
+def _run_ai_scan(keywords: list = None):
     _set_running("AI Overview Scan")
     try:
         from src.credentials_loader import setup_credentials
@@ -322,11 +374,11 @@ def _run_ai_scan():
         from src.data_exporter      import export_all_data
 
         setup_credentials()
-        result = run_ai_overview_check()
+        result = run_ai_overview_check(keywords_override=keywords)
 
         if not result:
             _set_done({"success": False,
-                       "message": "No results. Check SERPAPI_KEY."})
+                       "message": "No results — check SerpAPI credits"})
             return
 
         ai_results = result.get("results", [])
@@ -334,7 +386,8 @@ def _run_ai_scan():
         has_ov     = len([r for r in ai_results if r.get("has_overview")])
 
         try:
-            from src.analyzer import analyze_changes
+            from src.analyzer    import analyze_changes
+            from src.data_exporter import export_all_data
             report = analyze_changes()
             if report:
                 export_all_data(report=report, ai_results=ai_results)
@@ -356,10 +409,8 @@ def _run_ai_scan():
 @app.post("/ai-scan")
 def trigger_ai_scan(background_tasks: BackgroundTasks):
     if _is_running():
-        return JSONResponse(
-            status_code=409,
-            content={"error": f"Job already running: {_job_status['current_job']}"}
-        )
+        return JSONResponse(status_code=409,
+            content={"error": f"Job already running: {_job_status['current_job']}"})
     background_tasks.add_task(_run_ai_scan)
     return {"message": "AI Overview scan started", "job": "AI Overview Scan"}
 

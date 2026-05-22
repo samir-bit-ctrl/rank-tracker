@@ -1,5 +1,5 @@
 {
-  "updated": "2026-05-20 12:50",
+  "updated": "2026-05-20 16:07",
   "site": "studyriserr.com",
   "health": {
     "score": 80,
@@ -11,10 +11,10 @@
     "total_clicks": 1351,
     "total_impressions": 159116,
     "avg_ctr": 35.92,
-    "improved": 5,
-    "dropped": 2,
-    "new_today": 74,
-    "lost_today": 77,
+    "improved": 0,
+    "dropped": 0,
+    "new_today": 479,
+    "lost_today": 0,
     "top3": 92,
     "top10": 383
   },
@@ -47,27 +47,11 @@
   ],
   "pos_trend": [
     {
-      "date": "04-13",
-      "value": 5.2
-    },
-    {
-      "date": "05-19",
-      "value": 7.6
-    },
-    {
       "date": "05-20",
       "value": 7.6
     }
   ],
   "clicks_trend": [
-    {
-      "date": "04-13",
-      "value": 1489
-    },
-    {
-      "date": "05-19",
-      "value": 1528
-    },
     {
       "date": "05-20",
       "value": 1504
@@ -199,50 +183,6 @@
       "position": 1
     }
   ],
-  "improved": [
-    {
-      "keyword": "186 marks in bitsat",
-      "prev": 7.6,
-      "current": 1,
-      "delta": 6.6
-    },
-    {
-      "keyword": "cutoff for eamcet 2026",
-      "prev": 6.5,
-      "current": 1,
-      "delta": 5.5
-    },
-    {
-      "keyword": "amrita rank vs percentile 2025",
-      "prev": 6.5,
-      "current": 3,
-      "delta": 3.5
-    },
-    {
-      "keyword": "documents for aiims paramedical",
-      "prev": 4.2,
-      "current": 1,
-      "delta": 3.2
-    },
-    {
-      "keyword": "eamcet cut off marks 2025",
-      "prev": 9.1,
-      "current": 6.1,
-      "delta": 3.0
-    }
-  ],
-  "dropped": [
-    {
-      "keyword": "comedk cutoff 2026",
-      "prev": 16,
-      "current": 26,
-      "delta": -10
-    },
-    {
-      "keyword": "chandigarh university b pharma fees",
-      "prev": 12,
-      "current": 16,
-      "delta": -4
-    }
-  ]
+  "improved": [],
+  "dropped": []
 }
