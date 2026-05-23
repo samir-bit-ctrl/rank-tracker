@@ -678,8 +678,7 @@ function cmdTitle(cmd){
 
 async function runViaApi(cmd){
   const body=document.getElementById('results-body');
-  const isPost=['full-scan','aioverview'].includes(cmd);
-  body.innerHTML=`<div class="result-block"><div class="result-block-header"><span class="result-block-icon">⚡</span><span class="result-block-title">${cmdTitle(cmd)} — Running</span><span class="result-block-time">${now()}</span></div><div class="result-block-body"><div class="log-stream" id="log-stream"><span class="log-line info">▶ Connecting to API…</span><span class="log-cursor"></span></div><div class="progress-wrap"><div class="progress-bar" style="width:30%"></div></div></div></div>`;
+  const isPost = ['full-scan', 'aioverview', 'aio-local', 'target-scan'].includes(cmd);  body.innerHTML=`<div class="result-block"><div class="result-block-header"><span class="result-block-icon">⚡</span><span class="result-block-title">${cmdTitle(cmd)} — Running</span><span class="result-block-time">${now()}</span></div><div class="result-block-body"><div class="log-stream" id="log-stream"><span class="log-line info">▶ Connecting to API…</span><span class="log-cursor"></span></div><div class="progress-wrap"><div class="progress-bar" style="width:30%"></div></div></div></div>`;
   const log=document.getElementById('log-stream');
   function addLog(msg,type=''){
     const cursor=log.querySelector('.log-cursor');
@@ -692,27 +691,48 @@ async function runViaApi(cmd){
   if(!response.ok)throw new Error('API returned '+response.status);
   const data=await response.json();
   addLog('✓ Response received','success');
-  if(isPost){addLog('⏳ Job running…','info');await pollJobCompletion(addLog);}
-  else setTimeout(()=>renderApiResult(cmd,data),300);
+  if (isPost) {
+    addLog('⏳ Job running in background...', 'info');
+    await pollJobCompletion(addLog, cmd);   // pass cmd
+  } else {
+    setTimeout(() => renderApiResult(cmd, data), 300);
+  }
 }
-async function pollJobCompletion(addLog){
-  return new Promise((resolve)=>{
-    const iv=setInterval(async()=>{
-      try{
-        const r=await fetch(`${API_URL}/job-status`);const d=await r.json();
-        if(!d.running&&d.last_result){clearInterval(iv);addLog('✓ Job complete','success');setTimeout(()=>renderApiResult('full-scan',d.last_result),300);resolve();}
-      }catch{}
-    },2500);
+async function pollJobCompletion(addLog, cmd = 'full-scan') {
+  return new Promise((resolve) => {
+    let attempts = 0;
+    const interval = setInterval(async () => {
+      attempts++;
+      try {
+        const r    = await fetch(`${API_URL}/job-status`);
+        const data = await r.json();
+        if (!data.running && data.last_result) {
+          clearInterval(interval);
+          addLog('✅ Job complete!', 'success');
+          setTimeout(() => renderApiResult(cmd, data.last_result), 300);
+          resolve();
+        } else if (attempts > 60) {
+          clearInterval(interval);
+          addLog('⚠ Timeout — check Render logs', 'warning');
+          resolve();
+        }
+      } catch {}
+    }, 2500);
   });
 }
-function renderApiResult(cmd,data){
-  if(data.error){showError(data.error);return;}
-  switch(cmd){
-    case 'status':renderStatus(data);break;case 'top':renderTopKeywords(data);break;
-    case 'gainers':renderMovers(data,'gainers');break;case 'drops':renderMovers(data,'drops');break;
-    case 'targets':renderTargets(data);break;case 'aioverview':renderAiOverview(data);break;
-    case 'full-scan':renderFullScan(data);break;default:renderRaw(data);
-    case 'aio-local': renderAiOverview(data); break;
+
+function renderApiResult(cmd, data) {
+  if (data.error) { showError(data.error); return; }
+  switch(cmd) {
+    case 'status':     renderStatus(data);           break;
+    case 'top':        renderTopKeywords(data);       break;
+    case 'gainers':    renderMovers(data, 'gainers'); break;
+    case 'drops':      renderMovers(data, 'drops');   break;
+    case 'targets':    renderTargets(data);           break;
+    case 'aioverview': renderAiOverview(data);        break;
+    case 'aio-local':  renderAiOverview(data);        break;  // ← add this
+    case 'full-scan':  renderFullScan(data);          break;
+    default:           renderRaw(data);
   }
 }
 
